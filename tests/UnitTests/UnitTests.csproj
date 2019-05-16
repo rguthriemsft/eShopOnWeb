@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>Microsoft.eShopWeb.UnitTests</RootNamespace>
+    <ProjectGuid>{9D551E82-3252-4652-97A2-AF7871A68304}</ProjectGuid>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

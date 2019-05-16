@@ -5,6 +5,7 @@
     <RootNamespace>Microsoft.eShopWeb.Web</RootNamespace>
     <UserSecretsId>aspnet-Web2-1FA3F72E-E7E3-4360-9E49-1CCCD7FE85F7</UserSecretsId>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <ProjectGuid>{2F338211-1B45-4B07-A2F2-47C33ED25BF2}</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>
