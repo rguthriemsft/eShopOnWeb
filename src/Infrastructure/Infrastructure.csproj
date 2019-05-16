@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<RootNamespace>Microsoft.eShopWeb.Infrastructure</RootNamespace>
+		<ProjectGuid>{4A54FA5A-3BAA-4C21-B3BB-50387492A459}</ProjectGuid>
 	</PropertyGroup>
 
 	<ItemGroup>
