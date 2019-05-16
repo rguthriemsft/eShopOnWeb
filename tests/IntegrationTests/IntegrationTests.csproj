@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>Microsoft.eShopWeb.IntegrationTests</RootNamespace>
+    <ProjectGuid>{9F8EA57A-9168-4757-ADE5-4C3DDEA244C5}</ProjectGuid>
+
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
