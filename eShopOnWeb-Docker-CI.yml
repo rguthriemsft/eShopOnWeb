@@ -1,0 +1,31 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+  repositories:
+  - repository: eShopOnWeb
+    type: git
+    name: eShopOnWeb
+
+
+variables:
+  azureSubscriptionEndpoint: 'YOURAZURESERVICEENDPOINT'
+  ACR: 'YOURACLOGINSERVER'
+  
+steps:
+- task: Docker@1
+  displayName: 'Build an image'
+  inputs:
+    azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+    azureContainerRegistry: $(ACR)
+
+- task: Docker@1
+  displayName: Push
+  inputs:
+    azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+    azureContainerRegistry: $(ACR)
+    command: 'Push an image'
