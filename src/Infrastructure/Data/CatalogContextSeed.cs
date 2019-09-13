@@ -4,10 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.File;
-
 using Newtonsoft.Json;
 
 namespace Microsoft.eShopWeb.Infrastructure.Data
@@ -78,12 +76,12 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
         }
 
         static IEnumerable<CatalogItem> GetPreconfiguredItems()
-        {            
+        {
             var fileContent = LoadAzureStorafeFileContents("CatalogItems.json");
             if (fileContent == string.Empty)
                 return new List<CatalogItem>();
 
-            return JsonConvert.DeserializeObject<List<CatalogItem>>(fileContent);           
+            return JsonConvert.DeserializeObject<List<CatalogItem>>(fileContent);
         }
 
         static string LoadAzureStorafeFileContents(string fileName)
