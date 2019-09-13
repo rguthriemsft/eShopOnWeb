@@ -5,6 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.File;
+
+using Newtonsoft.Json;
+
 namespace Microsoft.eShopWeb.Infrastructure.Data
 {
     public class CatalogContextSeed
@@ -56,44 +61,58 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
 
         static IEnumerable<CatalogBrand> GetPreconfiguredCatalogBrands()
         {
-            return new List<CatalogBrand>()
-            {
-                new CatalogBrand() { Brand = "Azure"},
-                new CatalogBrand() { Brand = ".NET" },
-                new CatalogBrand() { Brand = "Visual Studio" },
-                new CatalogBrand() { Brand = "SQL Server" }, 
-                new CatalogBrand() { Brand = "Other" }
-            };
+            var fileContent = LoadAzureStorafeFileContents("CatalogBrands.json");
+            if (fileContent == string.Empty)
+                return new List<CatalogBrand>();
+
+            return JsonConvert.DeserializeObject<List<CatalogBrand>>(fileContent);
         }
 
         static IEnumerable<CatalogType> GetPreconfiguredCatalogTypes()
         {
-            return new List<CatalogType>()
-            {
-                new CatalogType() { Type = "Mug"},
-                new CatalogType() { Type = "T-Shirt" },
-                new CatalogType() { Type = "Sheet" },
-                new CatalogType() { Type = "USB Memory Stick" }
-            };
+            var fileContent = LoadAzureStorafeFileContents("CatalogTypes.json");
+            if (fileContent == string.Empty)
+                return new List<CatalogType>();
+
+            return JsonConvert.DeserializeObject<List<CatalogType>>(fileContent);
         }
 
         static IEnumerable<CatalogItem> GetPreconfiguredItems()
+        {            
+            var fileContent = LoadAzureStorafeFileContents("CatalogItems.json");
+            if (fileContent == string.Empty)
+                return new List<CatalogItem>();
+
+            return JsonConvert.DeserializeObject<List<CatalogItem>>(fileContent);           
+        }
+
+        static string LoadAzureStorafeFileContents(string fileName)
         {
-            return new List<CatalogItem>()
+            var storageAccountCS = "DefaultEndpointsProtocol=https;AccountName=eshoponwebaccount;AccountKey=vanOdqmnac+gJGy0MtIiTmGu0mgtcEMIIXKA2VHCMoCVsVtUiTD/mH/rB6LMOdztRp2Ou7fgpGx+PsnpcUJRAw==;EndpointSuffix=core.windows.net";
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageAccountCS);
+
+            // Create a CloudFileClient object for credentialed access to Azure Files.
+            CloudFileClient fileClient = storageAccount.CreateCloudFileClient();
+            CloudFileShare share = fileClient.GetShareReference("eshop");
+
+            //// Ensure that the share exists.
+            if (share.Exists())
             {
-                new CatalogItem() { CatalogTypeId=2,CatalogBrandId=2, Description = ".NET Bot Black Sweatshirt", Name = ".NET Bot Black Sweatshirt", Price = 19.5M, PictureUri = "http://catalogbaseurltobereplaced/images/products/1.png" },
-                new CatalogItem() { CatalogTypeId=1,CatalogBrandId=2, Description = ".NET Black & White Mug", Name = ".NET Black & White Mug", Price= 8.50M, PictureUri = "http://catalogbaseurltobereplaced/images/products/2.png" },
-                new CatalogItem() { CatalogTypeId=2,CatalogBrandId=5, Description = "Prism White T-Shirt", Name = "Prism White T-Shirt", Price = 12, PictureUri = "http://catalogbaseurltobereplaced/images/products/3.png" },
-                new CatalogItem() { CatalogTypeId=2,CatalogBrandId=2, Description = ".NET Foundation Sweatshirt", Name = ".NET Foundation Sweatshirt", Price = 12, PictureUri = "http://catalogbaseurltobereplaced/images/products/4.png" },
-                new CatalogItem() { CatalogTypeId=3,CatalogBrandId=5, Description = "Roslyn Red Sheet", Name = "Roslyn Red Sheet", Price = 8.5M, PictureUri = "http://catalogbaseurltobereplaced/images/products/5.png" },
-                new CatalogItem() { CatalogTypeId=2,CatalogBrandId=2, Description = ".NET Blue Sweatshirt", Name = ".NET Blue Sweatshirt", Price = 12, PictureUri = "http://catalogbaseurltobereplaced/images/products/6.png" },
-                new CatalogItem() { CatalogTypeId=2,CatalogBrandId=5, Description = "Roslyn Red T-Shirt", Name = "Roslyn Red T-Shirt", Price = 12, PictureUri = "http://catalogbaseurltobereplaced/images/products/7.png"  },
-                new CatalogItem() { CatalogTypeId=2,CatalogBrandId=5, Description = "Kudu Purple Sweatshirt", Name = "Kudu Purple Sweatshirt", Price = 8.5M, PictureUri = "http://catalogbaseurltobereplaced/images/products/8.png" },
-                new CatalogItem() { CatalogTypeId=1,CatalogBrandId=5, Description = "Cup<T> White Mug", Name = "Cup<T> White Mug", Price = 12, PictureUri = "http://catalogbaseurltobereplaced/images/products/9.png" },
-                new CatalogItem() { CatalogTypeId=3,CatalogBrandId=2, Description = ".NET Foundation Sheet", Name = ".NET Foundation Sheet", Price = 12, PictureUri = "http://catalogbaseurltobereplaced/images/products/10.png" },
-                new CatalogItem() { CatalogTypeId=3,CatalogBrandId=2, Description = "Cup<T> Sheet", Name = "Cup<T> Sheet", Price = 8.5M, PictureUri = "http://catalogbaseurltobereplaced/images/products/11.png" },
-                new CatalogItem() { CatalogTypeId=2,CatalogBrandId=5, Description = "Prism White TShirt", Name = "Prism White TShirt", Price = 12, PictureUri = "http://catalogbaseurltobereplaced/images/products/12.png" }
-            };
+                // Get a reference to the root directory for the share.
+                CloudFileDirectory rootDir = share.GetRootDirectoryReference();
+
+                //Get a reference to the file we created previously.
+                CloudFile file = rootDir.GetFileReference(fileName);
+
+                // Ensure that the file exists.
+                if (file.Exists())
+                {
+                    //download file content
+                    return file.DownloadTextAsync().Result;
+                }
+            }
+
+            return string.Empty;
         }
     }
 }
