@@ -5,27 +5,19 @@
 trigger:
 - master
 
+pool:
+  vmImage: 'ubuntu-16.04'
+
 resources:
   repositories:
-  - repository: eShopOnWeb
+  - repository: eShopWeb
     type: git
-    name: eShopOnWeb
-
-
-variables:
-  azureSubscriptionEndpoint: 'YOURAZURESERVICEENDPOINT'
-  ACR: 'YOURACLOGINSERVER'
+    name: eShopWeb
   
 steps:
-- task: Docker@1
-  displayName: 'Build an image'
+- task: CmdLine@2
   inputs:
-    azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
-    azureContainerRegistry: $(ACR)
-
-- task: Docker@1
-  displayName: Push
-  inputs:
-    azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
-    azureContainerRegistry: $(ACR)
-    command: 'Push an image'
+    script: |
+      docker login -u $(registryName) -p $(registryPassword) $(registryUrl)
+      docker build . -t $(registryUrl)/ase_test2:latest
+      docker push $(registryUrl)/ase_test2:latest
