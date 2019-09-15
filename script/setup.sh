@@ -5,7 +5,7 @@ IFS=$'\n\t'
 
 echo "$@"
 
-usage() { echo "Usage setup.sh -i <subscriptionId> -l <resourceGroupLocation> -n <teamName> -e <teamNumber> -u <azureUserName> -p <azurePassword> -t <tenantId>" 1>&2; exit 1; }
+usage() { echo "Usage setup.sh -i <subscriptionId> -l <resourceGroupLocation> -n <teamName> -e <teamNumber> -u <azureUserName> -p <azurePassword> -t <tenantId> -o <AzureDevOps organization> -d <Azure DevOps UserEmails>" 1>&2; exit 1; }
 
 
 declare subscriptionId=""
@@ -13,7 +13,10 @@ declare resourceGroupLocation=""
 declare teamName=""
 declare teamNumber=""
 
-while getopts ":i:l:n:e:q:r:t:u:p:j:" arg; do
+declare devopsOrganization=""
+declare devopsUserEmails=""
+
+while getopts ":i:l:n:e:q:r:t:u:p:j:o:d" arg; do
     case "${arg}" in
         i)
             subscriptionId=${OPTARG}
@@ -35,6 +38,12 @@ while getopts ":i:l:n:e:q:r:t:u:p:j:" arg; do
         ;;
         t)
             tenantId=${OPTARG}
+        ;;
+        o)
+            devopsOrganization=${OPTARG}
+        ;;
+        d)
+            devopsUserEmails=${OPTARG}
         ;;
     esac
 done
@@ -66,6 +75,7 @@ declare resourceGroupTeam = "${teamName}${teamNumber}rg";
 declare keyVaultName="${teamName}${teamNumber}kv";
 declare registryName="${teamName}${teamNumber}acr";
 declare webAppName="${teamName}${teamNumber}web";
+declare storageAccountName="${teamName}${teamNumber}sa"
 
 echo "=========================================="
 echo " VARIABLES"
@@ -99,10 +109,14 @@ az account set --subscription $subscriptionId
 
 declare tenantId=$(az account show -s ${subscriptionId} --query tenantId -o tsv)
 
+# create resourceGroup
 
-# Create ACR
+az group create -n $resourceGroupTeam -l $resourceGroupLocation
 
-# Create KeyVault 
-# Create Web App for Container 
+# Provision resource
 
-# Create Storage Account
+bash ./provision_resource.sh -s $subscriptionId -g $resourceGroupTeam -l $resourceGroupLocation -k $keyVaultName -r $registryName -i eshoponweb -a $storageAccountName -w $webAppName
+
+# Provision Azure DevOps
+
+bash ./provision_devops.sh -o $devopsOrganization -p DevSecOps -r eShopOnWeb -t https://github.com/rguthriemsft/eShopOnWeb -u <userEmails> -a $registryName
