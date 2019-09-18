@@ -57,7 +57,7 @@ namespace Microsoft.eShopWeb.Web
 
             // Add Identity DbContext
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseInMemoryDatabase("Identity"));
+                options.UseInMemoryDatabase("Identity"));        
 
             ConfigureServices(services);
         }
@@ -97,6 +97,7 @@ namespace Microsoft.eShopWeb.Web
             services.Configure<CatalogSettings>(Configuration);
             services.AddSingleton<IUriComposer>(new UriComposer(Configuration.Get<CatalogSettings>()));
 
+            services.AddSingleton<IConfiguration>(Configuration);        
             services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
             services.AddTransient<IEmailSender, EmailSender>();
 
