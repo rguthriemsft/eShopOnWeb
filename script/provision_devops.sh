@@ -35,6 +35,17 @@ while getopts ":o:p:r:t:u:a:" arg; do
 done
 shift $((OPTIND-1))
 
+echo "=========================================="
+echo " VARIABLES"
+echo "=========================================="
+echo "organization              = "${organization}
+echo "projectName               = "${projectName}
+echo "repositoryName            = "${repositoryName}
+echo "templateGitHubProject     = "${templateGitHubProject}
+echo "userEmails                = "${userEmails}
+echo "acrName                   = "${acrName}
+echo "=========================================="
+
 
 az extension add --name azure-devops
 az devops configure --defaults organization=$organization
@@ -47,9 +58,11 @@ az devops project create --name $projectName
 CurrentIFS=$IFS 
 IFS=','
 read -r -a emails <<< "$userEmails"
+echo "userEmails: ${userEmails}"
 
 for email in "${emails[@]}"
 do 
+  echo "email: ${email}"
   projectAdministratorDescriptor=`az devops security group list -p $projectName --scope=project --query "graphGroups[?displayName=='Project Administrators'].descriptor" --output tsv`
   buildAdministratorDescriptor=`az devops security group list -p $projectName --scope=project --query "graphGroups[?displayName=='Build Administrators'].descriptor" --output tsv`
   memberDescriptor=`az devops user show --user $email --query 'user.descriptor' --output tsv`
@@ -73,11 +86,11 @@ cred=$(az acr credential show -n $acrName)
 acrUsername=$(echo $cred | jq .username | xargs )
 acrPassword=$(echo $cred | jq .passwords[0].value | xargs )
 conf=$(az acr show -n $acrName)
-acrLoinServer=$(echo $conf | jq .loginServer | xargs )
+acrLoginServer=$(echo $conf | jq .loginServer | xargs )
 
 # Configure the variables of ACR
 
-az pipelines variable create --name registryUrl --value $acrLoinServer --pipeline-name eShopOnWeb-Docker.CI -p $projectName
+az pipelines variable create --name registryUrl --value $acrLoginServer --pipeline-name eShopOnWeb-Docker.CI -p $projectName
 az pipelines variable create --name registryPassword --value $acrPassword --pipeline-name eShopOnWeb-Docker.CI -p $projectName
 az pipelines variable create --name registryName --value $acrUsername --pipeline-name eShopOnWeb-Docker.CI -p $projectName
 

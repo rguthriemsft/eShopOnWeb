@@ -16,7 +16,7 @@ declare teamNumber=""
 declare devopsOrganization=""
 declare devopsUserEmails=""
 
-while getopts ":i:l:n:e:q:r:t:u:p:j:o:d" arg; do
+while getopts ":i:l:n:e:q:r:t:u:p:j:o:d:" arg; do
     case "${arg}" in
         i)
             subscriptionId=${OPTARG}
@@ -71,11 +71,12 @@ if [[ -z "$teamNumber" ]]; then
     teamNumber="$(randomChar;randomChar;randomChar;randomNum;)"
 fi
 
-declare resourceGroupTeam = "${teamName}${teamNumber}rg";
+declare resourceGroupTeam="${teamName}${teamNumber}rg";
 declare keyVaultName="${teamName}${teamNumber}kv";
 declare registryName="${teamName}${teamNumber}acr";
 declare webAppName="${teamName}${teamNumber}web";
 declare storageAccountName="${teamName}${teamNumber}sa"
+declare devopsProjectName="${teamName}${teamNumber}";
 
 echo "=========================================="
 echo " VARIABLES"
@@ -87,7 +88,12 @@ echo "teamNumber                = "${teamNumber}
 echo "keyVaultName              = "${keyVaultName}
 echo "resourceGroupTeam         = "${resourceGroupTeam}
 echo "registryName              = "${registryName}
-echo "tenantId"                 = "${tenantId}"
+echo "tenantId                  = "${tenantId}
+echo "devopsOrganization        = "${devopsOrganization}
+echo "devopsUserEmails          = "${devopsUserEmails}
+echo "devopsProjectName         = "${devopsProjectName}
+echo "storageAccountName        = "${storageAccountName}
+echo "webAppName                = "${webAppName}
 echo "=========================================="
 
 #login to azure using your credentials
@@ -119,4 +125,4 @@ bash ./provision_resource.sh -s $subscriptionId -g $resourceGroupTeam -l $resour
 
 # Provision Azure DevOps
 
-bash ./provision_devops.sh -o $devopsOrganization -p DevSecOps -r eShopOnWeb -t https://github.com/rguthriemsft/eShopOnWeb -u <userEmails> -a $registryName
+bash ./provision_devops.sh -o $devopsOrganization -p $devopsProjectName -r eShopOnWeb -t https://github.com/rguthriemsft/eShopOnWeb -u $devopsUserEmails -a $registryName
