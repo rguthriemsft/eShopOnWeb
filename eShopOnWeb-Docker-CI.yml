@@ -10,9 +10,9 @@ pool:
 
 resources:
   repositories:
-  - repository: eShopWeb
+  - repository: eShopOnWeb
     type: git
-    name: eShopWeb
+    name: eShopOnWeb
   
 steps:
 - task: CmdLine@2
