@@ -46,6 +46,19 @@ while getopts ":s:g:l:k:r:i:a:w:" arg; do
 done
 shift $((OPTIND-1))
 
+echo "=========================================="
+echo " VARIABLES"
+echo "=========================================="
+echo "subscriptionId            = "${subscriptionId}
+echo "resourceGroupName         = "${resourceGroupName}
+echo "location                  = "${location}
+echo "keyVaultName              = "${keyVaultName}
+echo "registryName              = "${registryName}
+echo "imageName                 = "${imageName}
+echo "storageAccountName        = "${storageAccountName}
+echo "webAppName                = "${webAppName}
+echo "=========================================="
+
 # Provision KeyVault
 az keyvault create -g $resourceGroupName --name $keyVaultName --location $location
 
@@ -61,14 +74,14 @@ cred=$(az acr credential show -n $registryName)
 acrUsername=$(echo $cred | jq .username | xargs )
 acrPassword=$(echo $cred | jq .passwords[0].value | xargs )
 conf=$(az acr show -n $registryName)
-acrLoinServer=$(echo $conf | jq .loginServer | xargs )
+acrLoginServer=$(echo $conf | jq .loginServer | xargs )
 
 acrImageName=${acrLoginServer}/${imageName}
 
 pushd . 
 cd ..
 docker build . -t ${acrImageName}:latest
-docker login -u ${acrUsername} -p ${acrPassword}
+docker login -u ${acrUsername} -p ${acrPassword} ${acrLoginServer}
 docker push ${acrImageName}:latest
 popd
 
@@ -80,11 +93,11 @@ az storage account create --name $storageAccountName --location $location --reso
 
 # App Service Plan
 declare appServicePlanName="${webAppName}plan"
-az appservice plan create -n ${appServicePlanName} -g $resourceGroupName --is-linux -l $location --sku S1 --number-of-workers
+az appservice plan create -n ${appServicePlanName} -g $resourceGroupName --is-linux -l $location --sku S1 
 
 # WebApp
 az webapp create -n $webAppName -g $resourceGroupName -p $appServicePlanName -i $acrImageName
-az webapp config container set -n $webAppName -g $resourceGroupName -c $acrImageName -r $acrLoinServer -u $registryName -p $acrPassword
+az webapp config container set -n $webAppName -g $resourceGroupName -c $acrImageName -r $acrLoginServer -u $registryName -p $acrPassword
 
 # Activate Docker Container Logging
 az webapp log config -n $webAppName -g $resourceGroupName --web-server-logging filesystem
