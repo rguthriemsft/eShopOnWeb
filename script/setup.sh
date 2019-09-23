@@ -5,10 +5,7 @@ IFS=$'\n\t'
 
 echo "$@"
 
-#usage() { echo "Usage setup.sh -i <subscriptionId> -l <resourceGroupLocation> -n <teamName> -e <teamNumber> -u <azureUserName> -p <azurePassword> -t <tenantId> -o <AzureDevOps organization> -d <Azure DevOps UserEmails>" 1>&2; exit 1; }
 usage() { echo "Usage setup.sh -l <resourceGroupLocation> -e <teamNumber> -o <AzureDevOps organization> -d <Azure DevOps UserEmails>" 1>&2; exit 1; }
-
-
 
 declare resourceGroupLocation=""
 declare teamName="DevSecOpsOHLite"
