@@ -5,39 +5,22 @@ IFS=$'\n\t'
 
 echo "$@"
 
-usage() { echo "Usage setup.sh -i <subscriptionId> -l <resourceGroupLocation> -n <teamName> -e <teamNumber> -u <azureUserName> -p <azurePassword> -t <tenantId> -o <AzureDevOps organization> -d <Azure DevOps UserEmails>" 1>&2; exit 1; }
+usage() { echo "Usage setup.sh -l <resourceGroupLocation> -e <teamNumber> -o <AzureDevOps organization> -d <Azure DevOps UserEmails>" 1>&2; exit 1; }
 
-
-declare subscriptionId=""
 declare resourceGroupLocation=""
-declare teamName=""
+declare teamName="DevSecOpsOHLite"
 declare teamNumber=""
 
 declare devopsOrganization=""
 declare devopsUserEmails=""
 
-while getopts ":i:l:n:e:q:r:t:u:p:j:o:d:" arg; do
+while getopts ":l:e:o:d:" arg; do
     case "${arg}" in
-        i)
-            subscriptionId=${OPTARG}
-        ;;
         l)
             resourceGroupLocation=${OPTARG}
         ;;
-        n)
-            teamName=${OPTARG}
-        ;;
         e)
             teamNumber=${OPTARG}
-        ;;
-        u)
-            azureUserName=${OPTARG}
-        ;;
-        p)
-            azurePassword=${OPTARG}
-        ;;
-        t)
-            tenantId=${OPTARG}
         ;;
         o)
             devopsOrganization=${OPTARG}
@@ -50,26 +33,7 @@ done
 
 shift $((OPTIND-1))
 
-randomChar() {
-    s=abcdefghijklmnopqrstuvxwyz0123456789
-    p=$(( $RANDOM % 36))
-    echo -n ${s:$p:1}
-}
 
-randomNum() {
-    echo -n $(( $RANDOM % 10 ))
-}
-
-randomCharUpper() {
-    s=ABCDEFGHIJKLMNOPQRSTUVWXYZ
-    p=$(( $RANDOM % 26))
-    echo -n ${s:$p:1}
-}
-
-if [[ -z "$teamNumber" ]]; then
-    echo "Using a random team number since not specified."
-    teamNumber="$(randomChar;randomChar;randomChar;randomNum;)"
-fi
 
 declare resourceGroupTeam="${teamName}${teamNumber}rg";
 declare keyVaultName="${teamName}${teamNumber}kv";
@@ -77,6 +41,9 @@ declare registryName="${teamName}${teamNumber}acr";
 declare webAppName="${teamName}${teamNumber}web";
 declare storageAccountName="${teamName}${teamNumber}sa"
 declare devopsProjectName="${teamName}${teamNumber}";
+
+declare tenantId=$(az account show --query tenantId -o tsv)
+declare subscriptionId=$(az account show --query id -o tsv)
 
 echo "=========================================="
 echo " VARIABLES"
@@ -95,25 +62,6 @@ echo "devopsProjectName         = "${devopsProjectName}
 echo "storageAccountName        = "${storageAccountName}
 echo "webAppName                = "${webAppName}
 echo "=========================================="
-
-#login to azure using your credentials
-echo "Username: $azureUserName"
-echo "Password: $azurePassword"
-
-if [[ "$tenantId" == "noSP" ]]; then
-    echo "Command will be az login --username=$azureUserName --password=$azurePassword"
-    az login --username=$azureUserName --password=$azurePassword
-else
-        echo "Command will be az login --username=$azureUserName --password=$azurePassword --tenant=$tenantId"
-    az login  --service-principal --username=$azureUserName --password=$azurePassword --tenant=$tenantId
-fi
-
-#set the default subscription id
-echo "Setting subscription to $subscriptionId..."
-
-az account set --subscription $subscriptionId
-
-declare tenantId=$(az account show -s ${subscriptionId} --query tenantId -o tsv)
 
 # create resourceGroup
 
