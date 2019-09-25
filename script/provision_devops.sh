@@ -19,6 +19,7 @@ while getopts ":o:p:r:t:u:a:d:" arg; do
         ;;
         p)
             projectName=${OPTARG}
+        ;;
         r)
             repositoryName=${OPTARG}
         ;;       
