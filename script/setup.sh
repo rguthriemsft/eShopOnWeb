@@ -73,4 +73,4 @@ bash ./provision_resource.sh -s $subscriptionId -g $resourceGroupTeam -l $resour
 
 # Provision Azure DevOps
 
-bash ./provision_devops.sh -o $devopsOrganization -p $devopsProjectName -r eShopOnWeb -t https://github.com/rguthriemsft/eShopOnWeb -u $devopsUserEmails -a $registryName
+bash ./provision_devops.sh -o $devopsOrganization -p $devopsProjectName -r eShopOnWeb -t https://github.com/rguthriemsft/eShopOnWeb -u $devopsUserEmails -a $registryName -d devops_config.json
