@@ -259,3 +259,6 @@ pub/
 .eshopdocker_*
 \.vscode/
 .DS_Store
+
+# Service Principal File for AzureDevOps
+devops_config.json
