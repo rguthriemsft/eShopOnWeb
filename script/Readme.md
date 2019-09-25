@@ -31,6 +31,8 @@ cd eShopOnWeb/script
 ### Deploy all
 
 Before running the setup script, you **MUST** execute ```az login``` and ```az account set``` in order for the script to work properly.
+Also, you need to create a servcie principal for accessing Azure DevOps project, and save it as `devops_config.json` and put it on script directory which is ignored by git.
+You can use `az ad sp create-for-rbac` command on the Azure DevOps subscription. the output is the format for `devops_config.json`. 
 
 ```bash
 az account login -u <azure account name> -p <azure account password>
