@@ -19,7 +19,6 @@ while getopts ":o:p:r:t:u:a:d:" arg; do
         ;;
         p)
             projectName=${OPTARG}
-        ;;projectName
         r)
             repositoryName=${OPTARG}
         ;;       
@@ -93,7 +92,7 @@ IFS=','
 read -r -a emails <<< "$userEmails"
 echo "userEmails: ${userEmails}"
 
-for email in "${emails[@]}"projectName
+for email in "${emails[@]}"
 do 
   echo "email: ${email}"
   projectAdministratorDescriptor=`az devops security group list -p $projectName --scope=project --query "graphGroups[?displayName=='Project Administrators'].descriptor" --output tsv`
