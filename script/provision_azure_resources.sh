@@ -109,7 +109,4 @@ jq -n --arg acrU $acrUsername --arg acrP $acrPassword --arg acrLs $acrLoginServe
 
 # Create Service Principal and output to sp_config.json
 export SP_JSON=`az ad sp create-for-rbac --role="Contributor" -o json`
-jq -n "$SP_JSON" > sp_config.json
-# Create Service Principal and output to sp_config.json
-export SP_JSON=`az ad sp create-for-rbac --role="Contributor" -o json`
 echo $SP_JSON | jq --arg subId ${subscriptionId} --arg subName ${subscriptionName} '. + {subscriptionId: $subId, subscriptionName: $subName}' | jq . > subscription.json
