@@ -264,4 +264,4 @@ pub/
 devops_config.json
 
 **/acr.json
-**/configuration.json
+**/subscription.json
