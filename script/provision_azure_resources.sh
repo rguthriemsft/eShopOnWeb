@@ -104,3 +104,7 @@ az webapp log config -n $webAppName -g $resourceGroupName --web-server-logging f
 # output ACR info
 jq -n --arg acrU $acrUsername --arg acrP $acrPassword --arg acrLs $acrLoginServer --arg acrIn $acrImageName '{
     acrUserName: $acrU, acrPassword: $acrP, acrLoginServer: $acrLs, acrImageName: $acrIn}' > acr.json
+
+# Create Service Principal and output to sp_config.json
+export SP_JSON=`az ad sp create-for-rbac --role="Contributor" -o json`
+jq -n "$SP_JSON" > sp_config.json

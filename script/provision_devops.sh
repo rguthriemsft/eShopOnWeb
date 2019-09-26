@@ -1,43 +1,31 @@
 
 #!/bin/bash
 
-usage() { echo "Usage: provision_devops.sh -o <organization> -p <projectName> -r <repositoryName> -t <templateGitHubProject> -u <userEmails> -a <acrName> -d <devops config file> " 1>&2; exit 1; }
+usage() { echo "Usage: provision_devops.sh -u <userEmails> -t <teamNumber>" 1>&2; exit 1; }
 
-declare organization=""
-declare projectName=""
-declare repositoryName=""
-declare templateGitHubProject=""
+declare organization="https://dev.azure.com/DevSecOpsOH"
+declare repositoryName="eShopOnWeb"
+declare templateGitHubProject="https://github.com/rguthriemsft/eShopOnWeb"
 declare userEmails=""
-declare acrName=""
-declare devopsConfigFile=""
+declare acrConfigFile="acr.json"
+declare spConfigFile="sp_config.json"
 
 # Initialize parameters specified from command line
-while getopts ":o:p:r:t:u:a:d:" arg; do
+while getopts ":u:t:" arg; do
     case "${arg}" in
-        o)
-            organization=${OPTARG}
-        ;;
-        p)
-            projectName=${OPTARG}
-        ;;
-        r)
-            repositoryName=${OPTARG}
-        ;;
-        t)
-            templateGitHubProject=${OPTARG}
-        ;;
+
         u)
             userEmails=${OPTARG}
         ;;
-        a)
-            acrName=${OPTARG}
+        t)
+            teamNumber=${OPTARG}
         ;;
-        d)
-            devopsConfigFile=${OPTARG}
-        ;;
+
     esac
 done
 shift $((OPTIND-1))
+
+declare projectName="devsecopsohlite"${teamNumber}
 
 echo "=========================================="
 echo " VARIABLES"
@@ -47,38 +35,16 @@ echo "projectName               = "${projectName}
 echo "repositoryName            = "${repositoryName}
 echo "templateGitHubProject     = "${templateGitHubProject}
 echo "userEmails                = "${userEmails}
-echo "acrName                   = "${acrName}
-echo "servicePrincipalFile      = "${servicePrincipprojectNamealFile}
 echo "=========================================="
 
-# Fetch the data of ACR. This section assume that az login is executed for resource deployment.
+# Fetch the data of ACR. This section assume acr,json was created in previous step
 
-cred=$(az acr credential show -n $acrName)
-acrUsername=$(echo $cred | jq .username | xargs )
-acrPassword=$(echo $cred | jq .passwords[0].value | xargs )
-conf=$(az acr show -n $acrName)
-acrLoginServer=$(echo $conf | jq .loginServer | xargs )
+conf=$(cat ${acrConfigFile})
+acrUsername=$(echo $conf | jq .acrUserName | xargs )
+acrPassword=$(echo $conf | jq .acrPassword | xargs )
+acrLoginServer=$(echo $conf | jq .acrLoginServer | xargs )
 
-# Create Service Principal of the current subscription
-# This command works for interactive login.
-# If you use service prinicpal for the login, you need to add owner role with API permission
-# for Microsoft Graph Application.ReadWrite.All and ApplicationReadWriteOwnedBy on your AD.
-
-serviceEndpointSp=$(az ad sp create-for-rbac)
-serviceEndpointSpAppId=$(echo $serviceEndpointSp | jq .appId | xargs )
-serviceEndpointSpPassword=$(echo $serviceEndpointSp | jq .password | xargs )
-serviceEndpointSpTenant=$(echo $serviceEndpointSp | jq .tenant | xargs )
-serviceEndpointSubscriptionId=$(az account show --query id -o tsv)
-serviceEndpointSubscriptionName=$(az account show --query name -o tsv)
-
-# Login to Azure DevOps project
-
-devopsSp=$(cat ${devopsConfigFile})
-devopsSpName=$(echo $devopsSp | jq .name | xargs )
-devopsSpPassword=$(echo $devopsSp | jq .password | xargs )
-devopsSpTenant=$(echo $devopsSp | jq .tenant | xargs )
-
-az login --service-prinicpal --username=$devopsSpName --password=$devopsSpPassword --tenant=$devopsSpTenant
+# Check and add extension
 
 az extension add --name azure-devops
 az devops configure --defaults organization=$organization
@@ -118,6 +84,10 @@ az pipelines create --name 'eShopOnWeb-Docker.CI' --description 'Pipeline for bu
 az pipelines variable create --name registryUrl --value $acrLoginServer --pipeline-name eShopOnWeb-Docker.CI -p $projectName
 az pipelines variable create --name registryPassword --value $acrPassword --pipeline-name eShopOnWeb-Docker.CI -p $projectName
 az pipelines variable create --name registryName --value $acrUsername --pipeline-name eShopOnWeb-Docker.CI -p $projectName
+
+# Read in SP information
+sp_conf=$(cat ${spConfigFile})
+acrUsername=$(echo $sp_conf | jq .acrUserName | xargs )
 
 # Configure the servcie endpoint
 
