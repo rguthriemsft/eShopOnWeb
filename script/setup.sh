@@ -70,7 +70,3 @@ az group create -n $resourceGroupTeam -l $resourceGroupLocation
 # Provision resource
 
 bash ./provision_resource.sh -s $subscriptionId -g $resourceGroupTeam -l $resourceGroupLocation -k $keyVaultName -r $registryName -i eshoponweb -a $storageAccountName -w $webAppName
-
-# Provision Azure DevOps
-
-bash ./provision_devops.sh -o $devopsOrganization -p $devopsProjectName -r eShopOnWeb -t https://github.com/rguthriemsft/eShopOnWeb -u $devopsUserEmails -a $registryName -d devops_config.json

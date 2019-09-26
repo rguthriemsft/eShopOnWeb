@@ -5,7 +5,7 @@ IFS=$'\n\t'
 
 echo "$@"
 
-usage() { echo "Usage setup.sh -l <resourceGroupLocation> -t <teamNumber>" 1>&2; exit 1; }
+usage() { echo "Usage provision_azure_resources.sh -l <resourceGroupLocation> -t <teamNumber>" 1>&2; exit 1; }
 
 declare resourceGroupLocation=""
 declare teamName="devsecopsohlite"
@@ -35,11 +35,13 @@ declare devopsProjectName="${teamName}${teamNumber}";
 declare imageName="eshoponweb"
 declare tenantId=$(az account show --query tenantId -o tsv)
 declare subscriptionId=$(az account show --query id -o tsv)
+declare subscriptionName=$(az account show --query name -o tsv)
 
 echo "=========================================="
 echo " VARIABLES"
 echo "=========================================="
 echo "subscriptionId            = "${subscriptionId}
+echo "subscriptionName          = "${subscriptionName}
 echo "tenantId                  = "${tenantId}
 echo "resourceGroupLocation     = "${resourceGroupLocation}
 echo "resourceGroupName         = "${resourceGroupName}
@@ -108,3 +110,7 @@ jq -n --arg acrU $acrUsername --arg acrP $acrPassword --arg acrLs $acrLoginServe
 # Create Service Principal and output to sp_config.json
 export SP_JSON=`az ad sp create-for-rbac --role="Contributor" -o json`
 jq -n "$SP_JSON" > sp_config.json
+
+# Output Subcription info
+
+echo -e "{\"subscriptionId\":\"${subscriptionId}\",\"subscriptionName\":\"${subscriptionName}\"}" > subscription.json

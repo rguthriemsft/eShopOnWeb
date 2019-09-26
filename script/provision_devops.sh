@@ -9,6 +9,7 @@ declare templateGitHubProject="https://github.com/rguthriemsft/eShopOnWeb"
 declare userEmails=""
 declare acrConfigFile="acr.json"
 declare spConfigFile="sp_config.json"
+declare subscriptionConfigFile="subscription.json"
 
 # Initialize parameters specified from command line
 while getopts ":u:t:" arg; do
@@ -87,7 +88,12 @@ az pipelines variable create --name registryName --value $acrUsername --pipeline
 
 # Read in SP information
 sp_conf=$(cat ${spConfigFile})
-acrUsername=$(echo $sp_conf | jq .acrUserName | xargs )
+serviceEndpointSpAppId=$(echo $sp_conf | jq .appId | xargs )
+serviceEndpointSpPassword=$(echo $sp_conf | jq .password | xargs )
+serviceEndpointSpTenant=$(echo $sp_conf | jq .tenant | xargs )
+ss_conf=$(cat ${subscriptionConfigFile})
+serviceEndpointSubscriptionId=$(echo $ss_conf | jq .subscriptionId | xargs )
+serviceEndpointSubscriptionName=$(echo $ss_conf | jq .subscriptionName | xargs )
 
 # Configure the servcie endpoint
 
