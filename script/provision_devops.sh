@@ -8,7 +8,6 @@ declare repositoryName="eShopOnWeb"
 declare templateGitHubProject="https://github.com/rguthriemsft/eShopOnWeb"
 declare userEmails=""
 declare acrConfigFile="acr.json"
-declare spConfigFile="sp_config.json"
 declare subscriptionConfigFile="subscription.json"
 
 # Initialize parameters specified from command line
@@ -87,13 +86,12 @@ az pipelines variable create --name registryPassword --value $acrPassword --pipe
 az pipelines variable create --name registryName --value $acrUsername --pipeline-name eShopOnWeb-Docker.CI -p $projectName
 
 # Read in SP information
-sp_conf=$(cat ${spConfigFile})
+sp_conf=$(cat ${subscriptionConfigFile})
 serviceEndpointSpAppId=$(echo $sp_conf | jq .appId | xargs )
 serviceEndpointSpPassword=$(echo $sp_conf | jq .password | xargs )
 serviceEndpointSpTenant=$(echo $sp_conf | jq .tenant | xargs )
-ss_conf=$(cat ${subscriptionConfigFile})
-serviceEndpointSubscriptionId=$(echo $ss_conf | jq .subscriptionId | xargs )
-serviceEndpointSubscriptionName=$(echo $ss_conf | jq .subscriptionName | xargs )
+serviceEndpointSubscriptionId=$(echo $sp_conf | jq .subscriptionId | xargs )
+serviceEndpointSubscriptionName=$(echo $sp_conf | jq .subscriptionName | xargs )
 
 # Configure the servcie endpoint
 
