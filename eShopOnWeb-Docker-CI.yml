@@ -19,5 +19,5 @@ steps:
   inputs:
     script: |
       docker login -u $(registryName) -p $(registryPassword) $(registryUrl)
-      docker build . -t $(registryUrl)/ase_test2:latest
-      docker push $(registryUrl)/ase_test2:latest
+      docker build . -t $(registryUrl)/eshoponweb:latest
+      docker push $(registryUrl)/eshoponweb:latest
