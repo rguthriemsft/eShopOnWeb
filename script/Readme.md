@@ -1,65 +1,70 @@
 # DevSecOps Openhack light Deployment Script
 
-This script deploys and configures all the resources your team will need in order to complete the challenges during the OpenHack.
+This script deploys and configures all the resources your team will need in order to complete the challenges during the OpenHack.  These resource
 
-* Azure KeyVault
-* Azure Container Registry
-* App Service
-* App Service Plan
-* Azure DevOps Project
+* **Deployed to OpsGility Subscription**
+  * Azure KeyVault
+  * Azure Container Registry
+  * App Service
+  * App Service Plan
 
-## How to use
+* **Deployed to Microsoft Azure DevOps Organization (https://dev.azure.com/DevSecOpsOH)**
+  * Azure DevOps Project
 
-You can find the deployment scripts on [eShopOnWeb](https://dev.azure.com/csedevops/DevSecOps/_git/eShopOnWeb?path=%2Fscript&version=GBmaster).
-Clone the repo and go to the `script` directory.
+## How to deploy lab env
+
+### High Level Overview
+
+1. Az Login to Opsgility subscription
+
+2. Provision Azure Resources in Opsgility subscription
+
+3. Az Login using your Microsoft Account
+
+4. Provision Azure DevOps resources
+
+### 1. Az Login to Opsgility Subscription
+
+Using the one of the credentials provided by Opsgility, execute an AZ Login (For testing you can either your internal subscription or MSDN subscription)
 
 ```bash
-git clone https://csedevops@dev.azure.com/csedevops/DevSecOps/_git/eShopOnWeb
-cd eShopOnWeb/script
+#For OpsGility use
+az login -u <username> -p <password>
+
+#For Internal or MSDN use (Will take you to browser to complete sign-in)
+az login
 ```
 
-### Parameters used in setup.sh script
+### 2. Provision the Azure Resources in Opsgility subscription
 
-**-l** Azure Region to deploy to (Ex. westus, eastus, centralus, etc.)
-
-**-e** Team Number, you will get this information from your proctor.
-
-**-o** The full url to the azure devops organization (Ex. `https://dev.azure.com/YOUR_ORGANIZATION)`
-
-**-d** comma seperated list of emails for team members.  These emails will be provisioned in the Azure Devops Project.
-
-### Deploy all
-
-Before running the setup script, you **MUST** execute ```az login``` and ```az account set``` in order for the script to work properly.
-Also, you need to create a servcie principal for accessing Azure DevOps project, and save it as `devops_config.json` and put it on script directory which is ignored by git.
-You can use `az ad sp create-for-rbac` command on the Azure DevOps subscription. the output is the format for `devops_config.json`. 
+This assumes you are in root of eShopOnWeb project
 
 ```bash
-az account login -u <azure account name> -p <azure account password>
+cd script
+./provision_azure_resources.sh -l westus -t <teamNumber>
 
-az account list #Find your account and note subscription id
 
+```
+Once this script completes, two files will be present in scripts directory. They are acr.json and subscription.json.  These files contain information needed during provisioning of devops resources in step 4.  Do not delete them.
+
+### 3. Az login to your MSFT Account
+
+Once you have provisioned the infrastructure you will need to do a second az login to login with your microsoft account.
+
+``` Bash
+az login #should open a browser where you can sign-in with your msft account.
+
+#If you ahve multiple subscriptions you need to set the correct subscription
+az account list
 az account set -s <subscription id>
 
-setup.sh -l <resourceGroupLocation> -e <teamNumber> -o <AzureDevOps organization> -d <Azure DevOps UserEmails>
+az account show
 ```
 
-#### Deploy All Example
+### 4. Deploy Azure DevOps project
+
+Finally, provision the devops project and by running the script below.  You will pass the same team number and a comma-seperated list of emails for users that should be provisioned into the project.
 
 ```bash
-setup.sh -l westus -e 1 -o https://dev.azure.com/YOUR_ORGANIZATION -d abc@microsoft.com,def@microsoft.com
-```
-
-### Deploy Azure DevOps Project
-
-This script assumes that you already execute `az login` and already have an Azure DevOps organization which this script creates a project.
-
-```bash
-provision_devops.sh -o <organization> -p <projectName> -r <repositoryName> -t <templateGitHubProject> -u <userEmails> -a <acrName>
-```
-
-#### Deploy Azure DevOps Example
-
-```bash
-bash provision_devops.sh -o https://dev.azure.com/YOUR_ORGANIZATION -p removethis -r eShopOnWeb -t https://github.com/rguthriemsft/eShopOnWeb -u abc@microsoft.com,def@microsoft.com -a tsushi05acr
+bash provision_devops.sh -u <Comma separated usernames> -t <teamNumber>
 ```
