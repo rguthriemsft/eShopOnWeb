@@ -1,22 +1,47 @@
 # DevSecOps Openhack light Deployment Script
 
-This script deploys and configures all the resources your team will need in order to complete the challenges during the OpenHack.
+This script deploys and configures all the resources your team will need in order to complete the challenges during the OpenHack.  These resource
 
-* Azure KeyVault
-* Azure Container Registry
-* App Service
-* App Service Plan
-* Azure DevOps Project
+* **Deployed to OpsGility Subscription**
+  * Azure KeyVault
+  * Azure Container Registry
+  * App Service
+  * App Service Plan
 
-## How to use
+* **Deployed to Microsoft Azure DevOps Organization (https://dev.azure.com/DevSecOpsOH)**
+  * Azure DevOps Project
 
-You can find the deployment scripts on [eShopOnWeb](https://dev.azure.com/csedevops/DevSecOps/_git/eShopOnWeb?path=%2Fscript&version=GBmaster).
-Clone the repo and go to the `script` directory.
+## How to deploy lab env
 
-```bash
-git clone https://csedevops@dev.azure.com/csedevops/DevSecOps/_git/eShopOnWeb
-cd eShopOnWeb/script
+### High Level Overview
+
+1. Az Login to Opsgility subscription
+
+2. Provision Azure Resources in Opsgility subscription
+
+3. Create Service Principal and save to file
+
+4. Az Login using your Microsoft Account
+
+5. Provision Azure DevOps resources
+
+### 1. Az Login to Opsgility Subscription
+
+Using the one of the credentials provided by Opsgility, execute an AZ Login
+
+``` Bash
+az login -u <username> -p <password>
 ```
+
+### 2. Provision the Azure Resources in Opsgility subscription.
+
+### 1. Deploy Azure Resources
+
+This service principal will be used to configure a service connection in Azure DevOPs.  Before running the setup script, you **MUST**:
+
+- execute ```az login```  ```az account set```, using your Microsoft Account in order for the script to work properly.
+Also, you need to create a servcie principal for accessing Azure DevOps project, and save it as `devops_config.json` and put it on script directory which is ignored by git.
+You can use `az ad sp create-for-rbac` command on the Azure DevOps subscription. the output is the format for `devops_config.json`.
 
 ### Parameters used in setup.sh script
 
@@ -30,9 +55,7 @@ cd eShopOnWeb/script
 
 ### Deploy all
 
-Before running the setup script, you **MUST** execute ```az login``` and ```az account set``` in order for the script to work properly.
-Also, you need to create a servcie principal for accessing Azure DevOps project, and save it as `devops_config.json` and put it on script directory which is ignored by git.
-You can use `az ad sp create-for-rbac` command on the Azure DevOps subscription. the output is the format for `devops_config.json`. 
+
 
 ```bash
 az account login -u <azure account name> -p <azure account password>
