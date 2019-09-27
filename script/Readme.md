@@ -8,7 +8,7 @@ This script deploys and configures all the resources your team will need in orde
   * App Service
   * App Service Plan
 
-* **Deployed to Microsoft Azure DevOps Organization (https://dev.azure.com/DevSecOpsOH)**
+* **Deployed to Microsoft Azure DevOps Organization (<https://dev.azure.com/DevSecOpsOH>)**
   * Azure DevOps Project
 
 ## How to deploy lab env
@@ -42,9 +42,8 @@ This assumes you are in root of eShopOnWeb project
 ```bash
 cd script
 ./provision_azure_resources.sh -l westus -t <teamNumber>
-
-
 ```
+
 Once this script completes, two files will be present in scripts directory. They are acr.json and subscription.json.  These files contain information needed during provisioning of devops resources in step 4.  Do not delete them.
 
 ### 3. Az login to your MSFT Account
