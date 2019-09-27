@@ -103,6 +103,10 @@ az webapp config container set -n $webAppName -g $resourceGroupName -c $acrImage
 # Activate Docker Container Logging
 az webapp log config -n $webAppName -g $resourceGroupName --web-server-logging filesystem
 
+# Setup Continuous Deployment (https://docs.microsoft.com/en-us/azure/app-service/containers/app-service-linux-cli)
+WEB_HOOK_URL=$(az webapp deployment container config -n ${webAppName} -g ${resourceGroupName} -e true | jq .CI_CD_URL | xargs )
+az acr webhook create -n WebAppDeployment -r ${registryName} --uri ${WEB_HOOK_URL} --actions push
+
 # output ACR info
 jq -n --arg acrU $acrUsername --arg acrP $acrPassword --arg acrLs $acrLoginServer --arg acrIn $acrImageName '{
     acrUserName: $acrU, acrPassword: $acrP, acrLoginServer: $acrLs, acrImageName: $acrIn}' > acr.json
