@@ -10,23 +10,17 @@
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /app
 
-COPY src /app 
-WORKDIR /app/Web
+COPY . .
+WORKDIR /app/src/Web
 RUN dotnet restore
 
 RUN dotnet publish -c Release -o out
 
 FROM microsoft/dotnet:2.2-aspnetcore-runtime AS runtime
 WORKDIR /app
-COPY --from=build /app/Web/out .
-
-
-RUN groupadd -r coreteam && useradd -r -s /bin/false -g coreteam coreteam
+COPY --from=build /app/src/Web/out ./
 
 # Optional: Set this here if not setting it from docker-compose.yml
 # ENV ASPNETCORE_ENVIRONMENT Development
-RUN chown -R coreteam:coreteam /app
-USER coreteam
-EXPOSE 8080
-ENV ASPNETCORE_URLS=http://+:8080
+
 ENTRYPOINT ["dotnet", "Web.dll", "--environment=development"]
