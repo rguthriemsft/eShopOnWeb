@@ -18,7 +18,7 @@ RUN dotnet publish -c Release -o out
 
 FROM microsoft/dotnet:2.2-aspnetcore-runtime AS runtime
 WORKDIR /app
-COPY --from=build /app/Web/out ./
+COPY --from=build /app/Web/out .
 
 
 RUN groupadd -r coreteam && useradd -r -s /bin/false -g coreteam coreteam
@@ -27,5 +27,6 @@ RUN groupadd -r coreteam && useradd -r -s /bin/false -g coreteam coreteam
 # ENV ASPNETCORE_ENVIRONMENT Development
 RUN chown -R coreteam:coreteam /app
 USER coreteam
-ENV ASPNETCORE_ENVIRONMENT=http://+:8080
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "Web.dll", "--environment=development"]
