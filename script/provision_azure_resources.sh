@@ -98,7 +98,8 @@ az appservice plan create -n ${appServicePlanName} -g $resourceGroupName --is-li
 
 # WebApp
 az webapp create -n $webAppName -g $resourceGroupName -p $appServicePlanName -i $acrImageName
-az webapp config container set -n $webAppName -g $resourceGroupName -c $acrImageName -r $acrLoginServer -u $registryName -p $acrPassword
+az webapp config container set -n $webAppName -g $resourceGroupName -c $acrImageName -r $acrLoginServer -u $registryName -p "$acrPassword"
+az webapp config appsettings set --resource-group $resourceGroupName --name $webAppName --settings WEBSITES_PORT=8080
 
 # Activate Docker Container Logging
 az webapp log config -n $webAppName -g $resourceGroupName --web-server-logging filesystem
