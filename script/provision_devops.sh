@@ -65,9 +65,11 @@ do
   az devops user add --email-id $email --license-type stakeholder --organization $organization --send-email-invite false
   projectAdministratorDescriptor=`az devops security group list --organization $organization -p $projectName --scope=project --query "graphGroups[?displayName=='Project Administrators'].descriptor" --output tsv`
   buildAdministratorDescriptor=`az devops security group list --organization $organization -p $projectName --scope=project --query "graphGroups[?displayName=='Build Administrators'].descriptor" --output tsv`
+  teamDescriptor=`az devops security group list --organization $organization -p $projectName --scope=project --query "graphGroups[?displayName=='$projectName Team'].descriptor" --output tsv`
   memberDescriptor=`az devops user show --user $email --query 'user.descriptor' --output tsv`
   az devops security group membership add --group-id $projectAdministratorDescriptor --member-id $memberDescriptor --organization $organization
   az devops security group membership add --group-id $buildAdministratorDescriptor --member-id $memberDescriptor --organization $organization
+  az devops security group membership add --group-id $teamDescriptor --member-id $memberDescriptor --organization $organization
 done
 
 IFS=$CurrentIFS
