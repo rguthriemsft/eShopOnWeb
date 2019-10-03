@@ -22,10 +22,7 @@ COPY --from=build /app/src/Web/out ./
 
 # Optional: Set this here if not setting it from docker-compose.yml
 # ENV ASPNETCORE_ENVIRONMENT Development
-RUN groupadd -r devsecops && useradd --no-log-init -r -g devsecops devsecops
-RUN mkdir /home/devsecops
-RUN chown -R devsecops /app
-RUN chown -R devsecops /home/devsecops
+RUN groupadd -r devsecops && useradd --no-log-init -r -g devsecops devsecops && mkdir /home/devsecops && chown -R devsecops /app && chown -R devsecops /home/devsecops
 ENV ASPNETCORE_URLS=http://+:8080 
 USER devsecops
 ENTRYPOINT ["dotnet", "Web.dll", "--environment=development"]
