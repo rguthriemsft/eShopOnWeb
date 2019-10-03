@@ -62,6 +62,7 @@ echo "userEmails: ${userEmails}"
 for email in "${emails[@]}"
 do
   echo "email: ${email}"
+  az devops user add --email-id $email --license-type stakeholder --organization $organization --send-email-invite false
   projectAdministratorDescriptor=`az devops security group list --organization $organization -p $projectName --scope=project --query "graphGroups[?displayName=='Project Administrators'].descriptor" --output tsv`
   buildAdministratorDescriptor=`az devops security group list --organization $organization -p $projectName --scope=project --query "graphGroups[?displayName=='Build Administrators'].descriptor" --output tsv`
   memberDescriptor=`az devops user show --user $email --query 'user.descriptor' --output tsv`
