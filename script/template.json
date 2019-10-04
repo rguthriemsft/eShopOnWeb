@@ -1,0 +1,465 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Location where resources will be provisioned"
+            },
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "aquaVmName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the VM"
+            }
+        },
+        "vmUsername": {
+            "type": "string",
+            "defaultValue": "ubuntu",
+            "metadata": {
+                "description": "User name for the Virtual Machine."
+            }
+        },
+        "sshPublicKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Enter public ssh key"
+            }
+        },
+        "registryId": {
+            "type": "string",
+            "metadata": {
+                "description": "User name for Docker Hub registry"
+            }
+        },
+        "registryPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for Docker Hub registry"
+            }
+        },
+        "aquaVersion": {
+            "type": "string",
+            "defaultValue": "3.5.0.2",
+            "metadata": {
+                "description": "The Aqua version to deploy"
+            }
+        },
+        "aquaLicenseToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Enter Aqua license token"
+            }
+        },
+        "aquaAdminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Please enter your Aqua administrator password"
+            }
+        },
+        "aquaDbPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Please enter a password for PostgreSQL DB that deployed by the Aqua componants."
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_DS2_v2",
+            "metadata": {
+                "description": "Azure VM size"
+            }
+        },
+        "vmDiskType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "metadata": {
+                "description": "The type of the OS disk. Premium is applicable only to DS machine sizes"
+            },
+            "allowedValues": [
+                "Standard_LRS",
+                "Premium_LRS"
+            ]
+        },
+        "vmDiagnostics": {
+            "defaultValue": "true",
+            "type": "string",
+            "metadata": {
+                "description": "Azure VM diags enable/disable"
+            }
+        },
+        "ubuntuOSVersion": {
+            "defaultValue": "16.04.0-LTS",
+            "allowedValues": [
+                "16.04.0-LTS",
+                "18.04-LTS"
+            ],
+            "type": "string",
+            "metadata": {
+                "description": "The Ubuntu version of the Aqua componants."
+            }
+        },
+        "webuiAccess": {
+            "type": "string",
+            "defaultValue": "0.0.0.0/0",
+            "metadata": {
+                "description": "WebUi - Default tag (e.g. Internet), source IP address or range for connections to the Aqua VM on port 8080 or 443 if template is modified."
+            }
+        },
+        "sshAccess": {
+            "type": "string",
+            "defaultValue": "0.0.0.0/0",
+            "metadata": {
+                "description": "SSH - Default tag (e.g. Internet), source IP address or range for connections to the Aqua VM on port 22."
+            }
+        },
+        "gatewayAccess": {
+            "type": "string",
+            "defaultValue": "0.0.0.0/0",
+            "metadata": {
+                "description": "Enforcer - Default tag (e.g. Internet), source IP address or range for connections to the Aqua VM on port 3622."
+            }
+        },
+        "virtualNetworkExistingRGName": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Name of resource group of existing VNET (if applicable) otherwise defaults to RG where server is deployed."
+            }
+        },
+        "vnetNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Use new or existing VNET"
+            }
+        },
+        "vnetName": {
+            "type": "string",
+            "defaultValue": "aquaVnet",
+            "metadata": {
+                "description": "The name to assign to the Vnet."
+            }
+        },
+        "vnetAddressPrefix": {
+            "type": "array",
+            "defaultValue": [
+                "172.16.3.0/24"
+            ],
+            "metadata": {
+                "description": "The CIDR to assign to the vNet."
+            }
+        },
+        "Subnet0Name": {
+            "type": "string",
+            "defaultValue": "AquaServerSubnet",
+            "metadata": {
+                "description": "The name of the Aqua server subnet."
+            }
+        },
+        "Subnet0AddressPrefix": {
+            "type": "string",
+            "defaultValue": "172.16.3.0/24",
+            "metadata": {
+                "description": "The CIDR to assign to the subnet."
+            }
+        },
+        "domainNamePrefix": {
+            "type": "string",
+            "defaultValue": "[toLower(concat(parameters('aquaVmName'), uniquestring(resourceGroup().id, deployment().name)))]",
+            "metadata": {
+                "description": "Prefix to domain name to access Aqua Command Center which is in the format: {prefix}.{location}.cloudapp.azure.com e.g. myaquaserver.westus.cloudapp.azure.com. Prefix should match the following regular expression ^[a-z][a-z0-9-]{1,61}[a-z0-9]$ or it will raise an error."
+            }
+        },
+        "diagStorageAccountName": {
+            "type": "string",
+            "defaultValue": "[concat('bootdiag', uniquestring(resourceGroup().id, deployment().name))]",
+            "metadata": {
+                "description": "Azure VM diag storage account name. Provide an account or accept the generated name."
+            }
+        },
+        "diagStorageResourceGroupName": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Azure VM diag storage account RG. Provide an resource group."
+            }
+        },
+        "diagStorageType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "metadata": {
+                "description": "Azure VM diag storage account type."
+            }
+        },
+        "diagStorageNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Use new or existing storage acct for diags"
+            }
+        },
+        "aquaDefaultSecurityGroup": {
+            "type": "string",
+            "defaultValue": "aquaDefaultSecurityGroup",
+            "metadata": {
+                "description": "Default security group name for this template"
+            }
+        }
+    },
+    "variables": {
+        "sshKeyPath": "[concat('/home/',parameters('vmUsername'),'/.ssh/authorized_keys')]",
+        "nicName": "[concat(parameters('aquaVmName'),'-nic')]",
+        "diagStorageAccountType": "Standard_LRS",
+        "publicIPAddressName": "[concat(parameters('aquaVmName'),'-pip')]",
+        "publicIPAddressType": "Static",
+        "subnetRef": "[resourceId(parameters('virtualNetworkExistingRGName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'),  parameters('subnet0Name'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "pid-7e3e82d3-1512-599b-aec1-7bbef54cc39d",
+            "apiVersion": "2018-02-01",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('diagStorageAccountName')]",
+            "condition": "[and(equals(parameters('vmDiagnostics'), 'true'), equals(parameters('diagStorageNewOrExisting'), 'new'))]",
+            "apiVersion": "2017-10-01",
+            "kind": "Storage",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[variables('diagStorageAccountType')]"
+            },
+            "properties": {
+                "accountType": "[parameters('diagStorageType')]"
+            }
+        },
+        {
+            "condition": "[equals(parameters('vNetNewOrExisting'), 'new')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('vnetName')]",
+            "apiVersion": "2017-10-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[parameters('vnetAddressPrefix')]"
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('Subnet0Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('Subnet0AddressPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName')]",
+            "apiVersion": "2017-10-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('domainNamePrefix')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "apiVersion": "2017-10-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('aquaDefaultSecurityGroup'))]"
+                }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('aquaDefaultSecurityGroup'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2018-01-01",
+            "location": "[parameters('location')]",
+            "name": "[parameters('aquaDefaultSecurityGroup')]",
+            "tags": {
+                "displayName": "Aqua Default Network Security Group"
+            },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "aqua-default-allow-webui",
+                        "properties": {
+                            "priority": 1000,
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceApplicationSecurityGroups": [],
+                            "destinationApplicationSecurityGroups": [],
+                            "sourceAddressPrefix": "[parameters('webuiAccess')]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "8080"
+                        }
+                    },
+                    {
+                        "name": "aqua-default-allow-ssh",
+                        "properties": {
+                            "priority": 1001,
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceApplicationSecurityGroups": [],
+                            "destinationApplicationSecurityGroups": [],
+                            "sourceAddressPrefix": "[parameters('sshAccess')]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "22"
+                        }
+                    },
+                    {
+                        "name": "aqua-default-allow-gateway-inbound",
+                        "properties": {
+                            "priority": 1002,
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceApplicationSecurityGroups": [],
+                            "destinationApplicationSecurityGroups": [],
+                            "sourceAddressPrefix": "[parameters('gatewayAccess')]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "3622"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('aquaVmName')]",
+            "apiVersion": "2017-12-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('aquaVmName')]",
+                    "adminUsername": "[parameters('vmUsername')]",
+                    "customData": "[base64(concat('#cloud-config\n\nwrite_files:\n -  encoding: gzip\n    content: !!binary |\n        H4sIANwUJVwAA7VWW2/bNhR+16/gVD20wBTl1izQIAxOrKZGkzizkg5DVxi0SMtaaFEhqaRG1v/eQ1NSZFuOnXbNgyKdO8/5vmO++sUbpZk3wnJiWTSecGRLRXMkFRbKRwnjI8ykbVkfLzrdi95l4OxZ3f7ph3Aw7HUDZ7/6uOpEUeAcWJ0/bzrDj+Eg6vXB9tB8n/dOw8soHF73P4QgfWuk83hzx7/6A4h1ZMTdk4bsNyMbhFf9wBY0SaUSsx18V2BJ452YT+2qgEF41ouuB3+vM2sejmakeTSjKQ/oI6d8s0tF80igbX7abT1LM3hhDBEe31LhxtS2ZEE4wrlyE6pQkROs6KKs8nFn6B8LwZ9WKIEzmXOh3IlSuSw1MYaQQqXjNIYwtbQQrHyVfKwesKBuLniuLal0oQVTnllzK3cso3M0D+l7HuEPGeOY7JhydbM8lmbFF68YFZkqvCRP0H+orvaWzhAmBLnWgmicZgkVuUgzhXbDk3en3ePj0oIQV1sJmnOZKi7KI9qEjtAnLOJJgKfk6PDz1iUZf+c1k6OhoIzCkJEbyzdGDo0csRf2vB4V+vfOGCWCF7k+p1EZYSGpmHI4Oz4r5TVYjIGcARCmsWIGCwvOTzqa6QprJaOAnb1dq4x4T4VMYVYs/JKqU05o4PxhpWP0CTm1CAUBsndt9Pl3NaEZnNqgsGsilAejBKYWx1TKccHYDODMJK1t3+FUWyi+hNdfEYUkKNZZ/EZKI4cp2zqENtmzxukKq1rAb70q62I8STPj4TTWBqCLNAyQW9TqXhe5bo6lfOCCuFIRUDtLhP+eRkVF3RadNIFGQGToxVLstT0zla46rOseWtO+6S1JBXJz5PFceeXC8gCrGNoWzTEErFGJoLJ70rJr5ILJHYPMmcJpRoVd4UkU0FKic7w9PNj39QOamuEpRTqfS0aGNy5FV/3o+mwQRo0F/Li8k7+W1verJfvePRbA1JH3VNBcAS5OvcfnEvi9of7CKv3RMcKuRBuTrJ2nbtJG75cOd5kbzw2rmnYH+qnlkjO6dt5No2cnfrx7vOvrh/44PDzwj+FRDrABgSqU6+oNFwjOVY2J6LRzDhgHCNxE4SCoqm/RbwGapvll5yIMZIwZFN2ifg9YDJzXE8g3L9RN36xYdW66veuNlVVWL6qvcjJVstshLki62pXK7Llql24/j6tXoqf0y3eix5abUoOBmm8wba/8oZTwz28TLhKwHPdP5V9rjm3p1+r8/7BvHXUW+HcGd4UHPHuef4kxepZ/B0f7+75+aLpRFWh8LDCvCmJubpvo9lK+bSLclozbknLfx7ltSbc96xpAKtv7U5HemmNbpLc6/wDSt4HpN92XTFXzDQAA\n    path: /opt/aquasec/aqua-install.sh\n    permissions: \"0744\"\n\n'))]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[variables('sshKeyPath')]",
+                                    "keyData": "[parameters('sshPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "[parameters('ubuntuOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[concat(parameters('aquaVmName'),'-osdisk')]",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('vmDiskType')]"
+                        }
+                    },
+                    "dataDisks": [
+                        {
+                            "name": "[concat(parameters('aquaVmName'),'-datadisk')]",
+                            "lun": 0,
+                            "createOption": "Empty",
+                            "diskSizeGB": 32,
+                            "managedDisk": {
+                                "storageAccountType": "[parameters('vmDiskType')]"
+                            }
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": "[if(bool(parameters('vmDiagnostics')), 'true', 'false')]",
+                        "storageUri": "[if(bool(parameters('vmDiagnostics')), reference(resourceId(parameters('diagStorageResourceGroupName'), 'Microsoft.Storage/storageAccounts', parameters('diagStorageAccountName')), '2017-06-01').primaryEndpoints.blob, json('null'))]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('aquaVmName'),'/installcustomscript')]",
+            "apiVersion": "2017-12-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {},
+                "protectedSettings": {
+                    "commandToExecute": "[concat('/opt/aquasec/aqua-install.sh',' ',parameters('vmUsername'),' ',parameters('registryId'),' ',parameters('registryPassword'),' ',parameters('aquaVersion'),' ',parameters('aquaLicenseToken'),' ',parameters('aquaAdminPassword'),' ',parameters('aquaDbPassword'))]"
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines/', parameters('aquaVmName'))]"
+            ]
+        }
+    ]
+}
