@@ -102,5 +102,8 @@ export AZURE_DEVOPS_EXT_AZURE_RM_SERVICE_PRINCIPAL_KEY=$serviceEndpointSpPasswor
 az devops service-endpoint azurerm create --azure-rm-service-principal-id $serviceEndpointSpAppId --azure-rm-subscription-id $serviceEndpointSubscriptionId --azure-rm-subscription-name "${serviceEndpointSubscriptionName}" --azure-rm-tenant-id $serviceEndpointSpTenant --name ${projectName}Se --project ${projectName} --organization $organization
 
 # Delete the default repo
-REPO_ID=`az repos list --organization $organization -p $projectName --query "[?name=='$projectName']" | jq '.[0].id'
-az repos delete --id $REPOS_ID --organization $organization -p $projectName --yes
+REPO_ID=`az repos list --organization $organization -p $projectName --query "[?name=='$projectName']" | jq '.[0].id' | tr -d '"'`
+
+echo "Deleting repo $projectName with ID: $REPO_ID"
+
+az repos delete --id $REPO_ID --organization $organization -p $projectName --yes

@@ -62,8 +62,15 @@ az account show
 
 ### 4. Deploy Azure DevOps project
 
-Finally, provision the devops project and by running the script below.  You will pass the same team number and a comma-seperated list of emails for users that should be provisioned into the project.
+Finally, provision the devops project and by running the script below.  You will pass the same team number and a **comma-seperated list** of emails for users that should be provisioned into the project.
 
 ```bash
 bash provision_devops.sh -u <Comma separated usernames> -t <teamNumber>
+```
+
+Example: Provision the project for Volker Will and Richard Guthrie who are in team 1
+
+```bash
+bash provision_devops.sh -u rguthrie@microsoft.com,volkerw@microsoft.com -t 1
+
 ```
