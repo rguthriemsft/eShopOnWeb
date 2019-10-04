@@ -121,4 +121,9 @@ declare sp=$(cat subscription.json | jq .appId | xargs)
 
 sleep 30
 az keyvault set-policy -n $keyVaultName --object-id $(az ad sp show --id ${sp} | jq .objectId | xargs ) --secret-permissions get list --key-permissions get list
+
+# Create an Aqua Server for Container Scanning Scenario
+echo "Creating Aqua Server"
+az group create --name aqua_rg --location resourceGroupLocation
+az group deployment create --name DeployAqua --resource-group aqua_rg --template-file ./template.json --parameters ./parameters.json
  

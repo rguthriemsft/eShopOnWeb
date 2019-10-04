@@ -1,0 +1,89 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "eastus2"
+        },
+        "aquaVmName": {
+            "value": "aqua-server"
+        },
+        "vmUsername": {
+            "value": "aquauser"
+        },
+        "sshPublicKey": {
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAg+3Cpm4g5ZJk65a9kVcUpaP6atdYEBtpsGtXj/OpvTEXCLm1ufQXd3OIJtB19hom6xoOxV8URTIBg8gtWmrYC+J7vBBUxxZ43bU0AhQ6lFjOkT78JlTe6+8UK66aoqIbju/i83AfkiRx0rMJTfXlYwkYE4a4YKSVISBY4MH/KIEEpNXFLlx96n5qmO9fDUwMDVp+LLIHvfvYCSkMS4Twl1MWa9tqP7Ght2Lj5nDJeZnR/qjA6VtKqexhe0yiwqkjLdu5iWjOBsFWzWMI18bhiC25Ao5w3SFa4NHAh97a+gtt3xOGYyIMY5aAv7CK6iN7D0U7fUbuMH6tMUbJ668M6Q== rsa-key-20190521"
+        },
+        "registryId": {
+            "value": "tsushi@microsoft.com"
+        },
+        "registryPassword": {
+            "value": "43TiYNT4L836ZR"
+        },
+        "aquaVersion": {
+            "value": "3.5.0.2"
+        },
+        "aquaLicenseToken": {
+            "value": "9pvG6IzhmeoFYEyJ_PaB33FBjeseQFo-VZ1woUAeEp3BCB5L-oLf_NSqI3oPXhXZ9DENcT0HcqNb0zeb2rCSe3Tk1ln1G7LtKEd5hcyjpGhmqXfJctwMPsMkl1qCJkkB13gGXkvCiGJxNiYytyJHX0ysdp32kO9gUEFwqB7foU1ScPcNtsZlpaiFSLc-sDXqBpR7KxpPFH16IzjwqqXS5A2FVoC8vhwcw7MofD2yKKFkB8ZnPLC1G65_MWxn_JA_K8ua5gQ-aRtxISmlmH66_GcmpQKbULCIlH9_2BYBUnacdTJkBs-dXhhZT2pBQO4gTf5zBWaC5zsJjkviuaVBMj-RRjo5O10XqNSf1EDV1na2RKtni18T7UGT9tkYcLTV3NqeXQVa9vkHDYteyHDOZVDtH0oqKxkjZvhrer8OeaMqB7uSASYvjYXR85Ewa3x8vg5FKuQcEutZNY5HSqqTmNUHUDxoAhV0HwrWz0zoRB-0ef6bxpEv3J69CTDuVP9NB9y7FO2z86763miIzhjyxZVwbJhxD_Gui7ESj5P7vLy0Db2ID0VC5eJUyUXJxPUQTtylW6hKOJU8hpCZNW6YtbHizlR31McdzkU3GBjwirzmys98IdVRO0FXaNng9Hjk2TaFH4ovfooZujcEJ38_UUCHLK236ziAm-EAQEw="
+        },
+        "aquaAdminPassword": {
+            "value": "CSEDem0#2829!"
+        },
+        "aquaDbPassword": {
+            "value": "CSEDem0#2829!"
+        },
+        "vmSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "vmDiskType": {
+            "value": "Premium_LRS"
+        },
+        "vmDiagnostics": {
+            "value": "true"
+        },
+        "diagStorageAccountName": {
+            "value": "bootdiag124481c2736e"
+        },
+        "diagStorageResourceGroupName": {
+            "value": "aqua_rg"
+        },
+        "diagStorageNewOrExisting": {
+            "value": "new"
+        },
+        "diagStorageType": {
+            "value": "Standard_LRS"
+        },
+        "ubuntuOSVersion": {
+            "value": "16.04.0-LTS"
+        },
+        "virtualNetworkExistingRGName": {
+            "value": "aqua_rg"
+        },
+        "vnetNewOrExisting": {
+            "value": "new"
+        },
+        "vnetAddressPrefix": {
+            "value": [
+                "10.0.3.0/24"
+            ]
+        },
+        "vnetName": {
+            "value": "aquaVnet"
+        },
+        "subnet0Name": {
+            "value": "AquaServerSubnet"
+        },
+        "subnet0AddressPrefix": {
+            "value": "10.0.3.0/24"
+        },
+        "webuiAccess": {
+            "value": "0.0.0.0/0"
+        },
+        "sshAccess": {
+            "value": "0.0.0.0/0"
+        },
+        "gatewayAccess": {
+            "value": "VirtualNetwork"
+        }
+    }
+}
