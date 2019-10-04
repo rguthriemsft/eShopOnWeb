@@ -258,3 +258,10 @@ pub/
 #Ignore marker-file used to know which docker files we have.
 .eshopdocker_*
 \.vscode/
+.DS_Store
+
+# Service Principal File for AzureDevOps
+devops_config.json
+
+**/acr.json
+**/subscription.json
