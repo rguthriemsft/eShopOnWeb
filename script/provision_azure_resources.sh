@@ -122,6 +122,12 @@ declare sp=$(cat subscription.json | jq .appId | xargs)
 sleep 30
 az keyvault set-policy -n $keyVaultName --object-id $(az ad sp show --id ${sp} | jq .objectId | xargs ) --secret-permissions get list --key-permissions get list
 
+# Add the required kv access-policy for the web app
+declare WEB_APP_SP=$(az webapp identity assign -g $resourceGroupName -n $webAppName | jq .principalId | xargs ) 
+
+sleep 30
+az keyvault set-policy -n $keyVaultName --object-id $WEB_APP_SP --secret-permissions get list --key-permissions get list
+
 # Create an Aqua Server for Container Scanning Scenario
 echo "Creating Aqua Server"
 az group create --name aqua_rg --location resourceGroupLocation
