@@ -124,6 +124,6 @@ az keyvault set-policy -n $keyVaultName --object-id $(az ad sp show --id ${sp} |
 
 # Create an Aqua Server for Container Scanning Scenario
 echo "Creating Aqua Server"
-az group create --name aqua_rg --location resourceGroupLocation
+az group create --name aqua_rg --location ${resourceGroupLocation}
 az group deployment create --name DeployAqua --resource-group aqua_rg --template-file ./template.json --parameters ./parameters.json
  
