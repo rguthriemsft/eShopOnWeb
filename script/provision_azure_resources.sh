@@ -118,5 +118,7 @@ echo $SP_JSON | jq --arg subId ${subscriptionId} --arg subName ${subscriptionNam
 
 # Add the required kv access-policy for the service principal
 declare sp=$(cat subscription.json | jq .appId | xargs)
+
+sleep 30
 az keyvault set-policy -n $keyVaultName --object-id $(az ad sp show --id ${sp} | jq .objectId | xargs ) --secret-permissions get list --key-permissions get list
  
