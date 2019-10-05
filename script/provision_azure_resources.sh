@@ -129,7 +129,14 @@ sleep 30
 az keyvault set-policy -n $keyVaultName --object-id $WEB_APP_SP --secret-permissions get list --key-permissions get list
 
 # Create an Aqua Server for Container Scanning Scenario
+
+declare diagStorageAccountName="${teamName}${teamNumber}dsa";
+
 echo "Creating Aqua Server"
-az group create --name aqua_rg --location ${resourceGroupLocation}
-az group deployment create --name DeployAqua --resource-group aqua_rg --template-file ./template.json --parameters ./parameters.json
+if [ `az group exists --name aqua_rg` ]; then 
+  az group delete --name aqua_rg -y
+fi
+
+az group create --name aqua_rg --location ${resourceGroupLocation} 
+az group deployment create --name DeployAqua --resource-group aqua_rg --template-file ./template.json --parameters ./parameters.json  --parameters diagStorageAccountName=${diagStorageAccountName}
  
