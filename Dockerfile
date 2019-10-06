@@ -27,5 +27,6 @@ RUN groupadd -r devsecops \
     && chown -R devsecops /app \
     && chown -R devsecops /home/devsecops
 ENV ASPNETCORE_URLS=http://+:8080 
+ENV eShopStorageAccountCS=${eShopStorageAccountCS}
 USER devsecops
 ENTRYPOINT ["dotnet", "Web.dll", "--environment=development"]
