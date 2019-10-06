@@ -87,13 +87,14 @@ docker push ${acrImageName}:latest
 popd
 
 # Provision Storage Account
+declare storageAccountFileShareName="eshop"
 
 az storage account create --name $storageAccountName --location $resourceGroupLocation --resource-group $resourceGroupName --sku Standard_LRS
 ST_CONNECTION_STRING=$(az storage account show-connection-string -n $storageAccountName -g $resourceGroupName --query 'connectionString' -o tsv)
-az storage share create --name data --quota 1 --connection-string $ST_CONNECTION_STRING
-az storage file upload --share-name data --source ./CatalogBrands.json --connection-string $ST_CONNECTION_STRING
-az storage file upload --share-name data --source ./CatalogItems.json --connection-string $ST_CONNECTION_STRING
-az storage file upload --share-name data --source ./CatalogTypes.json --connection-string $ST_CONNECTION_STRING
+az storage share create --name $storageAccountFileShareName --quota 1 --account-name $storageAccountName
+az storage file upload --share-name $storageAccountFileShareName --source ./CatalogBrands.json --account-name $storageAccountName
+az storage file upload --share-name $storageAccountFileShareName --source ./CatalogItems.json --account-name $storageAccountName
+az storage file upload --share-name $storageAccountFileShareName --source ./CatalogTypes.json --account-name $storageAccountName
 
 
 # Provision WebApp
