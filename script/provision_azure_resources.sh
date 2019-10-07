@@ -95,7 +95,7 @@ az storage file upload --share-name $modifiedStorageAccountFileShareName --sourc
 az storage file upload --share-name $modifiedStorageAccountFileShareName --source ./modifiedData/CatalogItems.json --account-name $storageAccountName
 az storage file upload --share-name $modifiedStorageAccountFileShareName --source ./originalData/CatalogTypes.json --account-name $storageAccountName
 
-# sed -i 's/REPLACEWITHCS/testingcsreplaced/g' CatalogContextSeed.cs
+sed -i "s/REPLACEWITHCS/${ST_CONNECTION_STRING}/g"  ../src/Infrastructure/Data/CatalogContextSeed.cs
 
 
 # Build and Publish images
