@@ -102,7 +102,7 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
 
                 // Create a CloudFileClient object for credentialed access to Azure Files.
                 CloudFileClient fileClient = storageAccount.CreateCloudFileClient();
-                CloudFileShare share = fileClient.GetShareReference("eshop");
+                CloudFileShare share = fileClient.GetShareReference("eshopmodified");
 
                 //// Ensure that the share exists.
                 if (share.Exists())
