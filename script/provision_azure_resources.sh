@@ -85,17 +85,19 @@ declare modifiedStorageAccountFileShareName="eshopmodified"
 az storage account create --name $storageAccountName --location $resourceGroupLocation --resource-group $resourceGroupName --sku Standard_LRS
 ST_CONNECTION_STRING=$(az storage account show-connection-string -n $storageAccountName -g $resourceGroupName --query 'connectionString' -o tsv)
 
-az storage share create --name $storageAccountFileShareName --quota 1 --account-name $storageAccountName
+az storage share create --name $originalStorageAccountFileShareName --quota 1 --account-name $storageAccountName
 az storage file upload --share-name $originalStorageAccountFileShareName --source ./originalData/CatalogBrands.json --account-name $storageAccountName
 az storage file upload --share-name $originalStorageAccountFileShareName --source ./originalData/CatalogItems.json --account-name $storageAccountName
 az storage file upload --share-name $originalStorageAccountFileShareName --source ./originalData/CatalogTypes.json --account-name $storageAccountName
 
-az storage share create --name $storageAccountFileShareName --quota 1 --account-name $storageAccountName
+az storage share create --name $modifiedStorageAccountFileShareName --quota 1 --account-name $storageAccountName
 az storage file upload --share-name $modifiedStorageAccountFileShareName --source ./originalData/CatalogBrands.json --account-name $storageAccountName
 az storage file upload --share-name $modifiedStorageAccountFileShareName --source ./modifiedData/CatalogItems.json --account-name $storageAccountName
 az storage file upload --share-name $modifiedStorageAccountFileShareName --source ./originalData/CatalogTypes.json --account-name $storageAccountName
 
-sed -i "s/REPLACEWITHCS/${ST_CONNECTION_STRING}/g"  ../src/Infrastructure/Data/CatalogContextSeed.cs
+echo "StorageConnectionString: ${ST_CONNECTION_STRING}"
+ESCAPED_ST_CONNECTION_STRING=$(echo "$ST_CONNECTION_STRING" | sed -r 's/\//\\\//g')
+sed -i "s/REPLACEWITHCS/${ESCAPED_ST_CONNECTION_STRING}/g"  ../src/Infrastructure/Data/CatalogContextSeed.cs
 
 
 # Build and Publish images
