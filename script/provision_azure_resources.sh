@@ -78,6 +78,26 @@ echo "ACR Password: $acrPassword"
 echo "ACR Login Server: $acrLoginServer"
 echo "Image Name: $acrImageName"
 
+# Provision Storage Account
+declare originalStorageAccountFileShareName="eshop"
+declare modifiedStorageAccountFileShareName="eshopmodified"
+
+az storage account create --name $storageAccountName --location $resourceGroupLocation --resource-group $resourceGroupName --sku Standard_LRS
+ST_CONNECTION_STRING=$(az storage account show-connection-string -n $storageAccountName -g $resourceGroupName --query 'connectionString' -o tsv)
+
+az storage share create --name $storageAccountFileShareName --quota 1 --account-name $storageAccountName
+az storage file upload --share-name $originalStorageAccountFileShareName --source ./originalData/CatalogBrands.json --account-name $storageAccountName
+az storage file upload --share-name $originalStorageAccountFileShareName --source ./originalData/CatalogItems.json --account-name $storageAccountName
+az storage file upload --share-name $originalStorageAccountFileShareName --source ./originalData/CatalogTypes.json --account-name $storageAccountName
+
+az storage share create --name $storageAccountFileShareName --quota 1 --account-name $storageAccountName
+az storage file upload --share-name $modifiedStorageAccountFileShareName --source ./originalData/CatalogBrands.json --account-name $storageAccountName
+az storage file upload --share-name $modifiedStorageAccountFileShareName --source ./modifiedData/CatalogItems.json --account-name $storageAccountName
+az storage file upload --share-name $modifiedStorageAccountFileShareName --source ./originalData/CatalogTypes.json --account-name $storageAccountName
+
+# sed -i 's/REPLACEWITHCS/testingcsreplaced/g' CatalogContextSeed.cs
+
+
 # Build and Publish images
 pushd .
 cd ..
@@ -85,17 +105,6 @@ docker build . -t ${acrImageName}:latest
 docker login -u ${acrUsername} -p ${acrPassword} ${acrLoginServer}
 docker push ${acrImageName}:latest
 popd
-
-# Provision Storage Account
-declare storageAccountFileShareName="eshop"
-
-az storage account create --name $storageAccountName --location $resourceGroupLocation --resource-group $resourceGroupName --sku Standard_LRS
-ST_CONNECTION_STRING=$(az storage account show-connection-string -n $storageAccountName -g $resourceGroupName --query 'connectionString' -o tsv)
-az storage share create --name $storageAccountFileShareName --quota 1 --account-name $storageAccountName
-az storage file upload --share-name $storageAccountFileShareName --source ./CatalogBrands.json --account-name $storageAccountName
-az storage file upload --share-name $storageAccountFileShareName --source ./CatalogItems.json --account-name $storageAccountName
-az storage file upload --share-name $storageAccountFileShareName --source ./CatalogTypes.json --account-name $storageAccountName
-
 
 # Provision WebApp
 
@@ -121,8 +130,7 @@ jq -n --arg acrU $acrUsername --arg acrP $acrPassword --arg acrLs $acrLoginServe
 
 # Create Service Principal and output to sp_config.json
 export SP_JSON=`az ad sp create-for-rbac --role="Contributor" -o json`
-echo $SP_JSON | jq --arg subId ${subscriptionId} --arg subName ${subscriptionName} '. + {subscriptionId: $subId, subscriptionName: $subName}' | jq . > subscription.json
-
+echo $SP_JSON | jq --arg subId ${subscriptionId} --arg subName ${subscriptionName} --arg stConnectionString ${ST_CONNECTION_STRING} '. + {subscriptionId: $subId, subscriptionName: $subName, storageConnectionString: $stConnectionString}' | jq . > subscription.json
 # Add the required kv access-policy for the service principal
 declare sp=$(cat subscription.json | jq .appId | xargs)
 
