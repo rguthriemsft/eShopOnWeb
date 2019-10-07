@@ -44,7 +44,7 @@ cd script
 ./provision_azure_resources.sh -l westus -t <teamNumber>
 ```
 
-Once this script completes, two files will be present in scripts directory. They are acr.json and subscription.json.  These files contain information needed during provisioning of devops resources in step 4.  Do not delete them.
+Once this script completes, two files will be present in scripts directory. They are acr.json and subscription.json.  These files contain information needed during provisioning of devops resources in step 4.  Do not delete them. Keeping a copy of these files after the provisioning has completed will save time during some of the challenges by making information quickly available to the team.
 
 ### 3. Az login to your MSFT Account
 
