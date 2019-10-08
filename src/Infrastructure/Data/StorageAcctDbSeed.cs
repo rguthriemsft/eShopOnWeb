@@ -11,11 +11,14 @@ using Newtonsoft.Json;
 
 namespace Microsoft.eShopWeb.Infrastructure.Data
 {
-    public class StorageAcctDbSeed : IDbSeed {
+        public class StorageAcctDbSeed : IDbSeed {
+
+        private string storageAccountConnStr;
 
         public StorageAcctDbSeed() {
 
         }
+
         public IEnumerable<CatalogBrand> GetPreconfiguredCatalogBrands()
         {
             var fileContent = this.LoadAzureStorageFileContents("CatalogBrands.json");
@@ -43,29 +46,43 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
             return JsonConvert.DeserializeObject<List<CatalogItem>>(fileContent);
         }
 
-        string LoadAzureStorageFileContents(string fileName)
+        private string GetStorageAccountCS()
         {
-            var storageAccountCS = "REPLACEWITHCS";
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageAccountCS);
-
-            // Create a CloudFileClient object for credentialed access to Azure Files.
-            CloudFileClient fileClient = storageAccount.CreateCloudFileClient();
-            CloudFileShare share = fileClient.GetShareReference("eshop");
-
-            //// Ensure that the share exists.
-            if (share.Exists())
+            if(string.IsNullOrEmpty(storageAccountConnStr))
             {
-                // Get a reference to the root directory for the share.
-                CloudFileDirectory rootDir = share.GetRootDirectoryReference();
+                this.storageAccountConnStr = Environment.GetEnvironmentVariable("eShopStorageAccountCS");
+            }
 
-                //Get a reference to the file we created previously.
-                CloudFile file = rootDir.GetFileReference(fileName);
+            return this.storageAccountConnStr;
+        }
 
-                // Ensure that the file exists.
-                if (file.Exists())
+        private string LoadAzureStorageFileContents(string fileName)
+        {
+            var storageAccountCS = GetStorageAccountCS();
+
+            if (!string.IsNullOrEmpty(storageAccountCS))
+            {
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageAccountCS);
+
+                // Create a CloudFileClient object for credentialed access to Azure Files.
+                CloudFileClient fileClient = storageAccount.CreateCloudFileClient();
+                CloudFileShare share = fileClient.GetShareReference("eshopmodified");
+
+                //// Ensure that the share exists.
+                if (share.Exists())
                 {
-                    //download file content
-                    return file.DownloadTextAsync().Result;
+                    // Get a reference to the root directory for the share.
+                    CloudFileDirectory rootDir = share.GetRootDirectoryReference();
+
+                    //Get a reference to the file we created previously.
+                    CloudFile file = rootDir.GetFileReference(fileName);
+
+                    // Ensure that the file exists.
+                    if (file.Exists())
+                    {
+                        //download file content
+                        return file.DownloadTextAsync().Result;
+                    }
                 }
             }
 
