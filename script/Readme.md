@@ -77,5 +77,5 @@ bash provision_devops.sh -u rguthrie@microsoft.com,volkerw@microsoft.com -t 1
 ### 5. Change ConnectionString in code
 
 Go to eShopOnWeb repo on the project that you provisioned at step 4.
-Find `../src/Inflastructure/Data/CatalogContextSeed.cs` and Search `REPLACEWIHCS`.
+Find `../src/Inflastructure/Data/CatalogContextSeed.cs` and Search `REPLACEWITHCS`.
 Rplace `REPLACEWITHCS` with the connection string that you can find in `subscription.json` in your machine. 
