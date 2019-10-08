@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.eShopWeb.Infrastructure.Data;
 using Microsoft.eShopWeb.Infrastructure.Identity;
+using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -23,8 +24,8 @@ namespace Microsoft.eShopWeb.Web
                 try
                 {
                     var catalogContext = services.GetRequiredService<CatalogContext>();
-                    CatalogContextSeed.SeedAsync(catalogContext, loggerFactory)
-            .Wait();
+                    var dbSeed = services.GetRequiredService<IDbSeed>();
+                    CatalogContextSeed.SeedAsync(catalogContext, loggerFactory, dbSeed).Wait();
 
                     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                     AppIdentityDbContextSeed.SeedAsync(userManager).Wait();

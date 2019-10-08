@@ -85,9 +85,9 @@ namespace Microsoft.eShopWeb.Web
             ConfigureCookieSettings(services);
 
             CreateIdentityIfNotCreated(services);
-            
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
 
+            services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
+            services.AddScoped(typeof(IDbSeed),typeof(StorageAcctDbSeed));
             services.AddScoped<ICatalogViewModelService, CachedCatalogViewModelService>();
             services.AddScoped<IBasketService, BasketService>();
             services.AddScoped<IBasketViewModelService, BasketViewModelService>();
@@ -114,7 +114,7 @@ namespace Microsoft.eShopWeb.Web
             {
                 options.Conventions.Add(new RouteTokenTransformerConvention(
                          new SlugifyParameterTransformer()));
-                
+
             }
             )
                 .AddRazorPagesOptions(options =>
@@ -227,7 +227,7 @@ namespace Microsoft.eShopWeb.Web
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {

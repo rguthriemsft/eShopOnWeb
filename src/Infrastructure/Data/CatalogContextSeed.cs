@@ -1,4 +1,5 @@
 ﻿using Microsoft.eShopWeb.ApplicationCore.Entities;
+using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
     public class CatalogContextSeed
     {
         public static async Task SeedAsync(CatalogContext catalogContext,
-            ILoggerFactory loggerFactory, int? retry = 0)
+            ILoggerFactory loggerFactory, IDbSeed dbSeed ,int? retry = 0)
         {
             int retryForAvailability = retry.Value;
             try
@@ -24,7 +25,7 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
                 if (!catalogContext.CatalogBrands.Any())
                 {
                     catalogContext.CatalogBrands.AddRange(
-                        GetPreconfiguredCatalogBrands());
+                        dbSeed.GetPreconfiguredCatalogBrands());
 
                     await catalogContext.SaveChangesAsync();
                 }
@@ -32,7 +33,7 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
                 if (!catalogContext.CatalogTypes.Any())
                 {
                     catalogContext.CatalogTypes.AddRange(
-                        GetPreconfiguredCatalogTypes());
+                        dbSeed.GetPreconfiguredCatalogTypes());
 
                     await catalogContext.SaveChangesAsync();
                 }
@@ -40,7 +41,7 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
                 if (!catalogContext.CatalogItems.Any())
                 {
                     catalogContext.CatalogItems.AddRange(
-                        GetPreconfiguredItems());
+                        dbSeed.GetPreconfiguredItems());
 
                     await catalogContext.SaveChangesAsync();
                 }
@@ -52,65 +53,9 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
                     retryForAvailability++;
                     var log = loggerFactory.CreateLogger<CatalogContextSeed>();
                     log.LogError(ex.Message);
-                    await SeedAsync(catalogContext, loggerFactory, retryForAvailability);
+                    await SeedAsync(catalogContext, loggerFactory, dbSeed, retryForAvailability);
                 }
             }
-        }
-
-        static IEnumerable<CatalogBrand> GetPreconfiguredCatalogBrands()
-        {
-            var fileContent = LoadAzureStorageFileContents("CatalogBrands.json");
-            if (fileContent == string.Empty)
-                return new List<CatalogBrand>();
-
-            return JsonConvert.DeserializeObject<List<CatalogBrand>>(fileContent);
-        }
-
-        static IEnumerable<CatalogType> GetPreconfiguredCatalogTypes()
-        {
-            var fileContent = LoadAzureStorageFileContents("CatalogTypes.json");
-            if (fileContent == string.Empty)
-                return new List<CatalogType>();
-
-            return JsonConvert.DeserializeObject<List<CatalogType>>(fileContent);
-        }
-
-        static IEnumerable<CatalogItem> GetPreconfiguredItems()
-        {
-            var fileContent = LoadAzureStorageFileContents("CatalogItems.json");
-            if (fileContent == string.Empty)
-                return new List<CatalogItem>();
-
-            return JsonConvert.DeserializeObject<List<CatalogItem>>(fileContent);
-        }
-
-        static string LoadAzureStorageFileContents(string fileName)
-        {
-            var storageAccountCS = "REPLACEWITHCS";
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageAccountCS);
-
-            // Create a CloudFileClient object for credentialed access to Azure Files.
-            CloudFileClient fileClient = storageAccount.CreateCloudFileClient();
-            CloudFileShare share = fileClient.GetShareReference("eshop");
-
-            //// Ensure that the share exists.
-            if (share.Exists())
-            {
-                // Get a reference to the root directory for the share.
-                CloudFileDirectory rootDir = share.GetRootDirectoryReference();
-
-                //Get a reference to the file we created previously.
-                CloudFile file = rootDir.GetFileReference(fileName);
-
-                // Ensure that the file exists.
-                if (file.Exists())
-                {
-                    //download file content
-                    return file.DownloadTextAsync().Result;
-                }
-            }
-
-            return string.Empty;
         }
     }
 }
