@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.eShopWeb.Infrastructure.Data;
 using Microsoft.eShopWeb.Infrastructure.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -28,10 +29,10 @@ namespace Microsoft.eShopWeb.Web
                     var catalogContext = services.GetRequiredService<CatalogContext>();
 
                     CatalogContextSeed.StorageAccountConnStr = GetAppSettingsConfigValue(serviceConfig, "appsettings.Development.json", "eShopStorageAccountCS");
-                    CatalogContextSeed.SeedAsync(catalogContext, loggerFactory)
-            .Wait();
+                    var dbSeed = services.GetRequiredService<IDbSeed>();
+                    CatalogContextSeed.SeedAsync(catalogContext, loggerFactory, dbSeed).Wait();
 
-                    
+
                     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                     AppIdentityDbContextSeed.SeedAsync(userManager).Wait();
                 }

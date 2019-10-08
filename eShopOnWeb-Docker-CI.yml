@@ -19,5 +19,6 @@ steps:
   inputs:
     script: |
       docker login -u $(registryName) -p $(registryPassword) $(registryUrl)
-      docker build . -t $(registryUrl)/eshoponweb:$(Build.BuildId)
-      docker push $(registryUrl)/eshoponweb:$(Build.BuildId)
+      docker build . -t $(registryUrl)/eshoponweb:$(Build.BuildId) 
+      docker tag $(registryUrl)/eshoponweb:$(Build.BuildId) $(registryUrl)/eshoponweb:latest
+      docker push $(registryUrl)/eshoponweb
