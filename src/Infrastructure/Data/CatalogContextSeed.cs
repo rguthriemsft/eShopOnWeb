@@ -59,7 +59,7 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
 
         static IEnumerable<CatalogBrand> GetPreconfiguredCatalogBrands()
         {
-            var fileContent = LoadAzureStorafeFileContents("CatalogBrands.json");
+            var fileContent = LoadAzureStorageFileContents("CatalogBrands.json");
             if (fileContent == string.Empty)
                 return new List<CatalogBrand>();
 
@@ -68,7 +68,7 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
 
         static IEnumerable<CatalogType> GetPreconfiguredCatalogTypes()
         {
-            var fileContent = LoadAzureStorafeFileContents("CatalogTypes.json");
+            var fileContent = LoadAzureStorageFileContents("CatalogTypes.json");
             if (fileContent == string.Empty)
                 return new List<CatalogType>();
 
@@ -77,14 +77,14 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
 
         static IEnumerable<CatalogItem> GetPreconfiguredItems()
         {
-            var fileContent = LoadAzureStorafeFileContents("CatalogItems.json");
+            var fileContent = LoadAzureStorageFileContents("CatalogItems.json");
             if (fileContent == string.Empty)
                 return new List<CatalogItem>();
 
             return JsonConvert.DeserializeObject<List<CatalogItem>>(fileContent);
         }
 
-        static string LoadAzureStorafeFileContents(string fileName)
+        static string LoadAzureStorageFileContents(string fileName)
         {
             var storageAccountCS = "REPLACEWITHCS";
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageAccountCS);
