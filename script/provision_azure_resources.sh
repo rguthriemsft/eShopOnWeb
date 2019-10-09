@@ -97,7 +97,7 @@ az storage file upload --share-name $modifiedStorageAccountFileShareName --sourc
 
 echo "StorageConnectionString: ${ST_CONNECTION_STRING}"
 ESCAPED_ST_CONNECTION_STRING=$(echo "$ST_CONNECTION_STRING" | sed -r 's/\//\\\//g')
-sed -i "s/REPLACEWITHCS/${ESCAPED_ST_CONNECTION_STRING}/g"  ../src/Infrastructure/Data/CatalogContextSeed.cs
+sed -i "s/REPLACEWITHCS/${ESCAPED_ST_CONNECTION_STRING}/g"  ../src/Infrastructure/Data/StorageAcctDbSeed.cs
 
 
 # Build and Publish images
