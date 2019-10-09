@@ -109,3 +109,8 @@ echo "Deleting repo $projectName with ID: $REPO_ID"
 az repos delete --id $REPO_ID --organization $organization -p $projectName --yes
 
 # Append to subscription.json
+projectId=$(az devops project show -p $projectName --org $organization | jq .id)
+projectIdTrimmed=$(echo "${projectId//\"}")
+
+configeFileData=$(cat ${subscriptionConfigFile})
+echo  $configeFileData |jq --arg ProjName ${projectName} --arg projId ${projectIdTrimmed} '. + {projectName: $ProjName, projectIdTrimmed: $projId}' | jq . > subscription.json
