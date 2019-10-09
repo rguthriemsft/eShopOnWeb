@@ -85,4 +85,4 @@ Go to eShopOnWeb repo on the project that you provisioned at step 4.
 
 * Replace `REPLACEWITHCS` with the connection string that you can find in `subscription.json` in your machine.
 
-* Merge the branch into both master and ch1_Fix branches.
+* Merge the branch into **master** branch.
