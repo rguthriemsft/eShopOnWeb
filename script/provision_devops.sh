@@ -107,3 +107,5 @@ REPO_ID=`az repos list --organization $organization -p $projectName --query "[?n
 echo "Deleting repo $projectName with ID: $REPO_ID"
 
 az repos delete --id $REPO_ID --organization $organization -p $projectName --yes
+
+# Append to subscription.json
