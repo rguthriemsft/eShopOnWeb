@@ -53,7 +53,7 @@ Once you have provisioned the infrastructure you will need to do a second az log
 ``` Bash
 az login #should open a browser where you can sign-in with your msft account.
 
-#If you ahve multiple subscriptions you need to set the correct subscription
+#If you have multiple subscriptions you need to set the correct subscription
 az account list
 az account set -s <subscription id>
 
@@ -74,8 +74,15 @@ Example: Provision the project for Volker Will and Richard Guthrie who are in te
 bash provision_devops.sh -u rguthrie@microsoft.com,volkerw@microsoft.com -t 1
 
 ```
+
 ### 5. Change ConnectionString in code
 
 Go to eShopOnWeb repo on the project that you provisioned at step 4.
-Find `../src/Inflastructure/Data/CatalogContextSeed.cs` and Search `REPLACEWITHCS`.
-Rplace `REPLACEWITHCS` with the connection string that you can find in `subscription.json` in your machine. 
+
+* Create a branch in the repo using git
+
+* Find `../src/Infrastructure/Data/StorageAcctDbSeed.cs` and Search for `REPLACEWITHCS`.
+
+* Rplace `REPLACEWITHCS` with the connection string that you can find in `subscription.json` in your machine.
+
+* Merge the branch into both master and ch1_Fix branches.
