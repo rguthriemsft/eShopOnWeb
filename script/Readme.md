@@ -1,9 +1,9 @@
-# DevSecOps Openhack light Deployment Script
+# DevSecOps OpenHack Light deployment script
 
-This script deploys and configures all the resources your team will need in order to complete the challenges during the OpenHack.  These resource
+This script deploys and configures all the resources your team will need in order to complete the challenges during the OpenHack. These resources:
 
-* **Deployed to OpsGility Subscription**
-  * Azure KeyVault
+* **Deployed to Opsgility Subscription**
+  * Azure Key Vault
   * Azure Container Registry
   * App Service
   * App Service Plan
@@ -37,23 +37,23 @@ az login
 
 ### 2. Provision the Azure Resources in Opsgility subscription
 
-This assumes you are in root of eShopOnWeb project
+This assumes you are in the root of eShopOnWeb project.
 
 ```bash
 cd script
 ./provision_azure_resources.sh -l westus -t <teamNumber>
 ```
 
-Once this script completes, two files will be present in scripts directory. They are acr.json and subscription.json.  These files contain information needed during provisioning of devops resources in step 4.  Do not delete them. Keeping a copy of these files after the provisioning has completed will save time during some of the challenges by making information quickly available to the team.
+Once this script completes, two files will be present in the scripts directory. They are acr.json and subscription.json. These files contain information needed during the provisioning of DevOps resources in step 4. Do not delete them. Keeping a copy of these files after the provisioning has completed will save time during some of the challenges by making information quickly available to the team.
 
 ### 3. Az login to your MSFT Account
 
-Once you have provisioned the infrastructure you will need to do a second az login to login with your microsoft account.
+Once you have provisioned the infrastructure, you will need to do a second az login to login with your Microsoft Account.
 
 ``` Bash
-az login #should open a browser where you can sign-in with your msft account.
+az login #should open a browser where you can sign-in with your MSFT account.
 
-#If you have multiple subscriptions you need to set the correct subscription
+#If you have multiple subscriptions, you need to set the correct subscription.
 az account list
 az account set -s <subscription id>
 
@@ -62,7 +62,7 @@ az account show
 
 ### 4. Deploy Azure DevOps project
 
-Finally, provision the devops project and by running the script below.  You will pass the same team number and a **comma-seperated list** of emails for users that should be provisioned into the project.
+Finally, provision the DevOps project by running the script below. You will pass the same team number and a **comma-separated list** of emails for users that should be provisioned into the project.
 
 ```bash
 bash provision_devops.sh -u <Comma separated usernames> -t <teamNumber>
@@ -83,6 +83,6 @@ Go to eShopOnWeb repo on the project that you provisioned at step 4.
 
 * Find `../src/Infrastructure/Data/StorageAcctDbSeed.cs` and Search for `REPLACEWITHCS`.
 
-* Rplace `REPLACEWITHCS` with the connection string that you can find in `subscription.json` in your machine.
+* Replace `REPLACEWITHCS` with the connection string that you can find in `subscription.json` in your machine.
 
-* Merge the branch into both master and ch1_Fix branches.
+* Merge the branch into **master** branch.
