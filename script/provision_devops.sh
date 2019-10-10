@@ -50,7 +50,7 @@ az extension add --name azure-devops
 az devops configure --defaults organization=$organization
 
 # Create Project
-az devops project create --name $projectName --organization $organization
+az devops project create --name $projectName --organization $organization -p Agile
 
 # Add users to Administrator groups
 
