@@ -75,14 +75,6 @@ bash provision_devops.sh -u rguthrie@microsoft.com,volkerw@microsoft.com -t 1
 
 ```
 
-### 5. Change ConnectionString in code
+### 5. Save your work
 
-Go to eShopOnWeb repo on the project that you provisioned at step 4.
-
-* Create a branch in the repo using git
-
-* Find `../src/Infrastructure/Data/StorageAcctDbSeed.cs` and Search for `REPLACEWITHCS`.
-
-* Replace `REPLACEWITHCS` with the connection string that you can find in `subscription.json` in your machine.
-
-* Merge the branch into **master** branch.
+Keep the subscription.json and acr.json files you will need them in Challenge 1.
