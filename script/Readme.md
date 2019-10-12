@@ -7,6 +7,7 @@ This script deploys and configures all the resources your team will need in orde
   * Azure Container Registry
   * App Service
   * App Service Plan
+  * Virtual Machine running Aqua
 
 * **Deployed to Microsoft Azure DevOps Organization (<https://dev.azure.com/DevSecOpsOH>)**
   * Azure DevOps Project
@@ -22,6 +23,8 @@ This script deploys and configures all the resources your team will need in orde
 3. Az Login using your Microsoft Account
 
 4. Provision Azure DevOps resources
+
+5. Save your work
 
 ### 1. Az Login to Opsgility Subscription
 
@@ -71,18 +74,10 @@ bash provision_devops.sh -u <Comma separated usernames> -t <teamNumber>
 Example: Provision the project for Volker Will and Richard Guthrie who are in team 1
 
 ```bash
-bash provision_devops.sh -u rguthrie@microsoft.com,volkerw@microsoft.com -t 1
+bash provision_devops.sh -u teamMember1@microsoft.com,teamMember2@microsoft.com -t 1
 
 ```
 
-### 5. Change ConnectionString in code
+### 5. Save your work
 
-Go to eShopOnWeb repo on the project that you provisioned at step 4.
-
-* Create a branch in the repo using git
-
-* Find `../src/Infrastructure/Data/StorageAcctDbSeed.cs` and Search for `REPLACEWITHCS`.
-
-* Replace `REPLACEWITHCS` with the connection string that you can find in `subscription.json` in your machine.
-
-* Merge the branch into **master** branch.
+Keep the `subscription.json` and `acr.json` files you will need them in Challenge 1.
