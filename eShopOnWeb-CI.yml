@@ -28,10 +28,22 @@ steps:
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: Test
+  displayName: Unit Tests
   inputs:
     command: test
-    projects: '*'
+    projects: '**/UnitTests.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+- task: DotNetCoreCLI@2
+  displayName: Integration Tests
+  inputs:
+    command: test
+    projects: '**/IntegrationTests.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+- task: DotNetCoreCLI@2
+  displayName: Functional Tests
+  inputs:
+    command: test
+    projects: '**/FunctionalTests.csproj'
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
