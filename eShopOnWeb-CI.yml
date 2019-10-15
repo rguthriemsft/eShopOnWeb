@@ -33,12 +33,14 @@ steps:
     command: test
     projects: '**/UnitTests.csproj'
     arguments: '--configuration $(BuildConfiguration)'
+
 - task: DotNetCoreCLI@2
   displayName: Integration Tests
   inputs:
     command: test
     projects: '**/IntegrationTests.csproj'
     arguments: '--configuration $(BuildConfiguration)'
+    
 - task: DotNetCoreCLI@2
   displayName: Functional Tests
   inputs:
