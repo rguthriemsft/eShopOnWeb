@@ -31,7 +31,7 @@ steps:
   displayName: Test
   inputs:
     command: test
-    projects: '**/UnitTests.csproj'
+    projects: '*'
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
