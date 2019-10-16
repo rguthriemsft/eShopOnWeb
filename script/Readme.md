@@ -32,7 +32,7 @@ Using the one of the credentials provided by Opsgility, execute an AZ Login (For
 
 ```bash
 #For OpsGility use
-az login -u <username> -p <password>
+az login -u <username> -p '<password>'
 
 #For Internal or MSDN use (Will take you to browser to complete sign-in)
 az login
@@ -63,21 +63,34 @@ az account set -s <subscription id>
 az account show
 ```
 
-### 4. Deploy Azure DevOps project
+### 4. Prepare Personal Access Token (PAT) for Azure DevOps
 
-Finally, provision the DevOps project by running the script below. You will pass the same team number and a **comma-separated list** of emails for users that should be provisioned into the project.
+Personal Access Token is required to configure Git repo for OpenHack challenges. To get PAT, please follow below steps:
+
+1. Go to [https://dev.azure.com/DevSecOpsOH/_usersSettings/tokens](https://dev.azure.com/DevSecOpsOH/_usersSettings/tokens), and click **New Token**.
+
+1. Fill out Name for your token (e.g. DevSecOps - code full), and select **Full** under **Code** section.
+
+    ![PAT create](images/PatCreate.png)
+    
+1. Save your Token for later use in the next section (5. Deploy Azure DevOps project).
+
+    ![PAT OK](images/PatCreateOk.png)
+
+### 5. Deploy Azure DevOps project
+
+Finally, provision the DevOps project by running the script below. You will pass the same team number, a **comma-separated list** of emails for users that should be provisioned into the project, and PAT created in previous section.
 
 ```bash
-bash provision_devops.sh -u <Comma separated usernames> -t <teamNumber>
+bash provision_devops.sh -u <Comma separated usernames> -t <teamNumber> -s '<personalAccessToken>'
 ```
 
 Example: Provision the project for Volker Will and Richard Guthrie who are in team 1
 
 ```bash
-bash provision_devops.sh -u teamMember1@microsoft.com,teamMember2@microsoft.com -t 1
-
+bash provision_devops.sh -u teamMember1@microsoft.com,teamMember2@microsoft.com -t 1 -s 'lqqmlixfx5sgfsfguu7bhsv5uggsdhjfkuhkhlljlkh2yyfgklsa'
 ```
 
-### 5. Save your work
+### 6. Save your work
 
 Keep the `subscription.json` and `acr.json` files you will need them in Challenge 1.
