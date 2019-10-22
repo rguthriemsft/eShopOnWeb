@@ -6,10 +6,10 @@
 # docker build --pull -t web -f src/Web/Dockerfile .
 #
 # RUN COMMAND
-#  docker run --name eshopweb --rm -it -p 5106:5106 web
+#  docker run --name eshopweb --rm -it -p 8080:8080 web
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /app
-COPY src /app 
+COPY src /app
 
 WORKDIR /app/Web
 RUN dotnet restore \
@@ -26,7 +26,11 @@ RUN groupadd -r devsecops \
     && mkdir /home/devsecops \
     && chown -R devsecops /app \
     && chown -R devsecops /home/devsecops
+<<<<<<< HEAD
 ENV ASPNETCORE_URLS=http://+:8080 
 ENV eShopStorageAccountCS=${eShopStorageAccountCS}
+=======
+ENV ASPNETCORE_URLS=http://+:8080
+>>>>>>> master
 USER devsecops
 ENTRYPOINT ["dotnet", "Web.dll", "--environment=development"]
